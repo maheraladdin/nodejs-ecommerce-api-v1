@@ -13,7 +13,7 @@ const slugify = require('slugify');
 // @route   GET /api/v1/subCategories || /api/v1/Categories/:id/subCategories
 // @desc    Get all subCategories
 // @access  Public
-module.exports.getAllSubCategories = asyncHandler(async (req, res, next) => {
+module.exports.getAllSubCategories = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
     const skip = (page - 1) * limit;
@@ -59,7 +59,7 @@ module.exports.getSubCategoryById = asyncHandler(async (req, res, next) => {
 // @access  Private
 // @body    name, parentCategory
 module.exports.createSubCategory = asyncHandler(async (req, res, next) => {
-    const {name,parentCategory} = req.body;
+    const {name, parentCategory} = req.body;
 
     // check if parentCategory already exists
     const parentCategoryExists = await CategoryModel.exists({ _id: parentCategory });
@@ -87,53 +87,35 @@ module.exports.createSubCategory = asyncHandler(async (req, res, next) => {
 // @access  Private
 // @params  id
 // @body    name
-module.exports.updateSubCategoryNameById = asyncHandler(async (req, res, next) => {
-    const { name } = req.body;
-    const { id } = req.params;
-
-    const subCategory = await SubCategoryModel.findByIdAndUpdate(
-        id,
-        { name, slug: slugify(name) },
-        {new: true}
-    )
-        // .populate(populateParentCategory);
-
-    if (!subCategory)
-        return next(new requestError(`SubCategory not found for id: ${id}`, 404));
-
-    res.status(200).json({
-        status: 'success',
-        data: {
-            subCategory,
-        },
-    });
-});
-
-// @route   PUT /api/v1/subCategories/:id/parentCategory
-// @desc    Update a subCategory parent category by subCategory id (params) and parent category id (body)
-// @access  Private
-// @params  id
-// @body    parentCategory
-module.exports.updateSubCategoryParentCategoryById = asyncHandler(async (req, res, next) => {
-    const { parentCategory } = req.body;
+module.exports.updateSubCategoryNameAndSubCategoryParentCategoryById = asyncHandler(async (req, res, next) => {
+    // get name and parentCategory from body
+    const {name, parentCategory} = req.body;
+    // get subcategory id from params
     const { id } = req.params;
 
     // check if parentCategory already exists
     const parentCategoryExists = await CategoryModel.exists({ _id: parentCategory });
 
     if (!parentCategoryExists)
-        return next(new requestError(`parent Category not exists for id: ${parentCategory}`, 404));
+        return next(new requestError(`there is no Category exists for id: ${parentCategory}`, 404));
 
+    // update subCategory
     const subCategory = await SubCategoryModel.findByIdAndUpdate(
         id,
-        { parentCategory },
+        {
+            name,
+            slug: slugify(name),
+            parentCategory
+        },
         {new: true}
     )
         // .populate(populateParentCategory);
 
+    // check if subCategory exists
     if (!subCategory)
         return next(new requestError(`SubCategory not found for id: ${id}`, 404));
 
+    // return response
     res.status(200).json({
         status: 'success',
         data: {

@@ -15,12 +15,7 @@ module.exports.getSubCategoryByIdValidator = expressValidatorCallback([CategoryI
 // @desc: Validator for updating subCategory by id from request params and name from request body
 // @usage: use this validator in routes to validate subCategory data
 // @note: this validator should be placed before the controller
-module.exports.updateSubCategoryNameByIdValidator = expressValidatorCallback([CategoryIdRule, CategoryNameRule]);
-
-// @desc: Validator for updating subCategory parent category by id from request params and new parent category id from request body
-// @usage: use this validator in routes to validate subCategory data
-// @note: this validator should be placed before the controller
-module.exports.updateSubCategoryParentCategoryByIdValidator = expressValidatorCallback([CategoryIdRule, parentSubCategoryIdRule]);
+module.exports.updateSubCategoryNameAndSubCategoryParentCategoryByIdValidator = expressValidatorCallback([CategoryIdRule, CategoryNameRule, parentSubCategoryIdRule]);
 
 // @desc: Validator for deleting subCategory by id from request params
 // @usage: use this validator in routes to validate subCategory data
