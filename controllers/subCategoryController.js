@@ -10,6 +10,14 @@ const slugify = require('slugify');
 //     select: 'name -_id',
 // };
 
+// @desc    Create a filter object for getting subCategories
+// @usage   use this middleware in routes to create a filter object for getting subCategories
+module.exports.createFilterObject = (req, res, next) => {
+    const { id } = req.params;
+    req.filter = id ? { parentCategory: id } : {};
+    next();
+}
+
 // @route   GET /api/v1/subCategories || /api/v1/Categories/:id/subCategories
 // @desc    Get all subCategories
 // @access  Public
@@ -17,12 +25,8 @@ module.exports.getAllSubCategories = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
     const skip = (page - 1) * limit;
-    const { id } = req.params;
 
-    // if parentCategory id is provided in params, get subCategories by parentCategory id
-    let filter = id ? { parentCategory: id } : {};
-
-    const subCategories = await SubCategoryModel.find(filter).skip(skip).limit(limit);
+    const subCategories = await SubCategoryModel.find(req.filter).skip(skip).limit(limit);
         // .populate(populateParentCategory);
 
     res.status(200).json({
@@ -54,11 +58,22 @@ module.exports.getSubCategoryById = asyncHandler(async (req, res, next) => {
     });
 });
 
+// @desc    if parentCategory doesn't exist in body then set parentCategory to id from params
+// @usage   use this middleware in routes to set parentCategory to id from params if parentCategory doesn't exist in body
+module.exports.setParentCategoryToBody = async (req,res,next) => {
+    if(!req.body.parentCategory) req.body.parentCategory = req.params.id;
+    next();
+}
+
 // @route   POST /api/v1/subCategories
 // @desc    Create a new subCategory
 // @access  Private
 // @body    name, parentCategory
 module.exports.createSubCategory = asyncHandler(async (req, res, next) => {
+    // nested route
+    if(!req.body.parentCategory) req.body.parentCategory = req.params.id;
+
+    // get name and parentCategory from body
     const {name, parentCategory} = req.body;
 
     // check if parentCategory already exists
