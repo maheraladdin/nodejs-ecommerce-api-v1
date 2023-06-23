@@ -6,6 +6,7 @@ const morgan = require('morgan');
 // require routes
 const categoryRoute = require('./routes/categoryRoute');
 const subCategoryRoute = require('./routes/subCategoryRoute');
+const brandRoute = require('./routes/brandRoute');
 
 // require middlewares
 const errorHandler = require('./middlewares/errorHandlerMW');
@@ -38,6 +39,7 @@ const mainPath = "/api/v1"
 // @usage: use this middleware to mount routes
 app.use(`${mainPath}/categories`,categoryRoute);
 app.use(`${mainPath}/subCategories`,subCategoryRoute);
+app.use(`${mainPath}/brands`,brandRoute);
 
 // @desc: Error handler middleware for handling all unhandled routes
 // @usage: use this middleware at the end of all routes
