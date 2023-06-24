@@ -1,61 +1,58 @@
-const Category = require("../models/categoryModel");
+const Product = require("../models/productModel");
 const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const requestError = require("../utils/requestError");
 
-// @route   GET /api/v1/categories
-// @desc    Get all categories
+// @route   GET /api/v1/products
+// @desc    Get all products
 // @access  Public
 // @query   page, limit
-module.exports.getCategories = asyncHandler(async (req, res) => {
+module.exports.getProducts = asyncHandler(async (req, res) => {
+    // pagination
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
     const skip = (page - 1) * limit;
-    const categories = await Category.find().skip(skip).limit(limit);
+
+    const products = await Product.find().skip(skip).limit(limit);
     res.status(200).json({
         status: 'success',
-        length: categories.length,
+        length: products.length,
         page,
         data: {
-            categories,
+            products,
         },
     });
 });
 
-// @route   GET /api/v1/categories/:id
-// @desc    Get a category by id
+// @route   GET /api/v1/products/:id
+// @desc    Get a product by id
 // @access  Public
 // @params  id
-module.exports.getCategoryById = asyncHandler(async (req, res,next) => {
+module.exports.getProductById = asyncHandler(async (req, res,next) => {
     const { id } = req.params;
-    const category = await Category.findById(id);
-    if (!category)
-        return next(new requestError(`Category not found for id: ${id}`, 404));
+    const product = await Product.findById(id);
+    if (!product)
+        return next(new requestError(`Product not found for id: ${id}`, 404));
 
     res.status(200).json({
         status: 'success',
         data: {
-            category,
+            product,
         },
     });
 });
 
-// @route   POST /api/v1/categories
-// @desc    Create a new category
+// @route   POST /api/v1/products
+// @desc    Create a new product
 // @access  Private
-// @body    name
 module.exports.createCategory = asyncHandler(async (req, res) => {
-    const {name} = req.body;
-
-    const category = await Category.create({
-        name,
-        slug: slugify(name),
-    });
+    req.body.slug = slugify(req.body.title);
+    const product = await Product.create(req.body);
 
     res.status(201).json({
         status: 'success',
         data: {
-            category,
+            product,
         },
     });
 
@@ -65,23 +62,19 @@ module.exports.createCategory = asyncHandler(async (req, res) => {
 // @desc    Update a category by id
 // @access  Private
 // @params  id
-// @body    name
 module.exports.updateCategory = asyncHandler(async (req, res,next) => {
-    const {name} = req.body;
+    req.body.slug = slugify(req.body.title);
     const { id } = req.params;
 
-    const category = await Category.findByIdAndUpdate(id, {
-        name,
-        slug: slugify(name),
-    }, { new: true });
+    const product = await Product.findByIdAndUpdate(id, req.body, { new: true });
 
-    if (!category)
-        return next(new requestError(`Category not found for id: ${id}`, 404));
+    if (!product)
+        return next(new requestError(`Product not found for id: ${id}`, 404));
 
     res.status(200).json({
         status: 'success',
         data: {
-            category,
+            product,
         },
     });
 
@@ -91,17 +84,15 @@ module.exports.updateCategory = asyncHandler(async (req, res,next) => {
 // @desc    Delete a category by id
 // @access  Private
 // @params  id
-// @usage   /api/v1/categories/5f7f1f7baf4b0b2b7c7c7c7c
 module.exports.deleteCategory = asyncHandler(async (req, res,next) => {
     const { id } = req.params;
-    const category = await Category.findByIdAndDelete(id);
+    const product = await Product.findByIdAndDelete(id);
 
-    if (!category)
-        return next(new requestError(`Category not found for id: ${id}`, 404));
+    if (!product)
+        return next(new requestError(`Product not found for id: ${id}`, 404));
 
     res.status(204).json({
         status: 'success',
         data: null,
     });
-
 });

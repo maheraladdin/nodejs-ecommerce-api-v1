@@ -12,6 +12,7 @@ const slugify = require('slugify');
 
 // @desc    Create a filter object for getting subCategories
 // @usage   use this middleware in routes to create a filter object for getting subCategories
+// @params  id
 module.exports.createFilterObject = (req, res, next) => {
     const { id } = req.params;
     req.filter = id ? { parentCategory: id } : {};
@@ -21,6 +22,7 @@ module.exports.createFilterObject = (req, res, next) => {
 // @route   GET /api/v1/subCategories || /api/v1/Categories/:id/subCategories
 // @desc    Get all subCategories
 // @access  Public
+// @query   page, limit
 module.exports.getAllSubCategories = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
@@ -42,6 +44,7 @@ module.exports.getAllSubCategories = asyncHandler(async (req, res) => {
 // @route   GET /api/v1/subCategories/:id
 // @desc    Get a subCategory by id
 // @access  Public
+// @params  id
 module.exports.getSubCategoryById = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const subCategory = await SubCategoryModel.findById(id)
@@ -60,6 +63,7 @@ module.exports.getSubCategoryById = asyncHandler(async (req, res, next) => {
 
 // @desc    if parentCategory doesn't exist in body then set parentCategory to id from params
 // @usage   use this middleware in routes to set parentCategory to id from params if parentCategory doesn't exist in body
+// @params  id
 module.exports.setParentCategoryToBody = async (req,res,next) => {
     if(!req.body.parentCategory) req.body.parentCategory = req.params.id;
     next();
@@ -70,8 +74,6 @@ module.exports.setParentCategoryToBody = async (req,res,next) => {
 // @access  Private
 // @body    name, parentCategory
 module.exports.createSubCategory = asyncHandler(async (req, res, next) => {
-    // nested route
-    if(!req.body.parentCategory) req.body.parentCategory = req.params.id;
 
     // get name and parentCategory from body
     const {name, parentCategory} = req.body;
@@ -101,7 +103,7 @@ module.exports.createSubCategory = asyncHandler(async (req, res, next) => {
 // @desc    Update a subCategory name by id
 // @access  Private
 // @params  id
-// @body    name
+// @body    name, parentCategory
 module.exports.updateSubCategoryNameAndSubCategoryParentCategoryById = asyncHandler(async (req, res, next) => {
     // get name and parentCategory from body
     const {name, parentCategory} = req.body;

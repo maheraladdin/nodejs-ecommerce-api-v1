@@ -7,7 +7,6 @@ const requestError = require("../utils/requestError");
 // @desc    Get all brands
 // @access  Public
 // @query   page, limit
-// @usage   /api/v1/brands?page=1&limit=5
 module.exports.getBrands = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
@@ -27,7 +26,6 @@ module.exports.getBrands = asyncHandler(async (req, res) => {
 // @desc    Get a brand by id
 // @access  Public
 // @params  id
-// @usage   /api/v1/brands/5f7f1f7baf4b0b2b7c7c7c7c
 module.exports.getBrandById = asyncHandler(async (req, res,next) => {
     const { id } = req.params;
     const brand = await Brand.findById(id);
@@ -46,7 +44,6 @@ module.exports.getBrandById = asyncHandler(async (req, res,next) => {
 // @desc    Create a new brand
 // @access  Private
 // @body    name
-// @usage   /api/v1/brands
 module.exports.createBrand = asyncHandler(async (req, res) => {
     const {name} = req.body;
 
@@ -69,7 +66,6 @@ module.exports.createBrand = asyncHandler(async (req, res) => {
 // @access  Private
 // @params  id
 // @body    name
-// @usage   /api/v1/brands/5f7f1f7baf4b0b2b7c7c7c7c
 module.exports.updateBrand = asyncHandler(async (req, res,next) => {
     const {name} = req.body;
     const { id } = req.params;
@@ -95,7 +91,6 @@ module.exports.updateBrand = asyncHandler(async (req, res,next) => {
 // @desc    Delete a category by id
 // @access  Private
 // @params  id
-// @usage   /api/v1/categories/5f7f1f7baf4b0b2b7c7c7c7c
 module.exports.deleteBrand = asyncHandler(async (req, res,next) => {
     const { id } = req.params;
     const brand = await Brand.findByIdAndDelete(id);
