@@ -5,7 +5,7 @@ const express = require("express");
 const router = express.Router();
 
 // require utils validators
-const { getCategoryByIdValidator, createCategoryValidator, updateCategoryValidator, deleteCategoryValidator } = require("../utils/Validators/CategoryValidators");
+const { getCategoryByIdValidator, createCategoryValidator, updateCategoryValidator, deleteCategoryValidator } = require("../utils/ValidationLayer/Validators/CategoryValidators");
 
 // require controllers
 const { getCategories, getCategoryById, createCategory, updateCategoryById, deleteCategoryById } = require("../controllers/categoryController");

@@ -1,5 +1,5 @@
-const expressValidatorCallback = require("../expressValidatorCallback");
-const {BrandNameRule, BrandIdRule } = require("../ValidatorRules/brandRules");
+const expressValidatorCallback = require("../../expressValidatorCallback");
+const {BrandNameRule, BrandIdRule } = require("../ValidationRules/brandRules");
 
 // @desc: Validator for getting category by id from request params
 // @usage: use this validator in routes to validate category id

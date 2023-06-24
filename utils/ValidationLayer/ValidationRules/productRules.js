@@ -1,4 +1,6 @@
 const {check} = require("express-validator");
+const categoryExists = require("../CustomValidationRules/categoryExists");
+const DiscountedPriceLessThanPrice = require("../CustomValidationRules/DiscountedPriceLessThanPrice");
 
 // @desc: Rule checks if product title is provided, and is between 3 and 50 characters long
 // @usage: use this Rule inside expressValidatorCallback utility function
@@ -56,12 +58,7 @@ module.exports.ProductDiscountedPriceRule = check("discountedPrice")
     .toFloat()
     .isFloat({ min: 1 })
     .withMessage("Product discounted price must be greater than 0")
-    .custom((value, { req }) => {
-        if (value > req.body.price) {
-            throw new Error("Product discounted price must be less than product price");
-        }
-        return true;
-    });
+    .custom(DiscountedPriceLessThanPrice);
 
 // @desc: Rule checks if product colors is provided
 // @usage: use this Rule inside expressValidatorCallback utility function
@@ -87,7 +84,16 @@ module.exports.ProductImagesRule = check("images")
 // @usage: use this Rule inside expressValidatorCallback utility function
 module.exports.ProductCategoryIdRule = check("category")
     .isMongoId()
-    .withMessage("Invalid Category id format");
+    .withMessage("Invalid Category id format")
+    .custom(categoryExists);
+
+// @desc: Rule checks optionally if product category id is valid mongo id
+// @usage: use this Rule inside expressValidatorCallback utility function
+module.exports.OptionalProductCategoryIdRule = check("category")
+    .optional()
+    .isMongoId()
+    .withMessage("Invalid Category id format")
+    .custom(categoryExists);
 
 // @desc: Rule checks if product subcategory id is valid mongo id
 // @usage: use this Rule inside expressValidatorCallback utility function

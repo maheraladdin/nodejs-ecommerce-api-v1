@@ -1,4 +1,5 @@
 const {check} = require("express-validator");
+const categoryExists = require("../CustomValidationRules/categoryExists");
 
 // @desc: Rule checks if subCategory name is provided, and is between 2 and 50 characters long
 // @usage: use this Rule inside expressValidatorCallback utility function
@@ -29,11 +30,13 @@ module.exports.subCategoryIdRule = check("id")
 // @usage: use this Rule inside expressValidatorCallback utility function
 module.exports.categoryIdRule = check("category")
     .isMongoId()
-    .withMessage("Invalid parent category id format");
+    .withMessage("Invalid parent category id format")
+    .custom(categoryExists);
 
 // @desc: Rule checks optionally if category id for subCategory is valid mongo id
 // @usage: use this Rule inside expressValidatorCallback utility function
 module.exports.optionalCategoryIdRule = check("category")
     .optional()
     .isMongoId()
-    .withMessage("Invalid parent category id format");
+    .withMessage("Invalid parent category id format")
+    .custom(categoryExists);

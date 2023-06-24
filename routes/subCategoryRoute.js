@@ -18,19 +18,18 @@ const { createSubCategory,
 const { createSubCategoryValidator,
         getSubCategoryByIdValidator,
         updateSubCategoryValidator,
-        deleteSubCategoryByIdValidator } = require("../utils/Validators/SubCategoryValidators");
+        deleteSubCategoryByIdValidator } = require("../utils/ValidationLayer/Validators/SubCategoryValidators");
 
 // require middlewares
-const categoryExists = require('../middlewares/categoryExists.js');
 
 // routes
 router.route("/")
-    .post(setParentCategoryToBody, createSubCategoryValidator, categoryExists, createSubCategory)
+    .post(setParentCategoryToBody, createSubCategoryValidator, createSubCategory)
     .get(createFilterObject, getAllSubCategories);
 
 router.route("/:id")
     .get(getSubCategoryByIdValidator, getSubCategoryById)
-    .put(updateSubCategoryValidator, categoryExists, updateSubCategoryById)
+    .put(updateSubCategoryValidator, updateSubCategoryById)
     .delete(deleteSubCategoryByIdValidator, deleteSubCategoryById);
 
 

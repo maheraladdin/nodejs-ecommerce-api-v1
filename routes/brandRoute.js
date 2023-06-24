@@ -5,7 +5,7 @@ const express = require("express");
 const router = express.Router();
 
 // require utils validators
-const { getBrandByIdValidator, createBrandValidator, updateBrandValidator, deleteBrandValidator } = require("../utils/Validators/brandValidators");
+const { getBrandByIdValidator, createBrandValidator, updateBrandValidator, deleteBrandValidator } = require("../utils/ValidationLayer/Validators/brandValidators");
 
 // require controllers
 const { getBrands, getBrandById, createBrand, updateBrandById, deleteBrandById } = require("../controllers/brandController");

@@ -10,7 +10,7 @@ const {
     createProductValidator,
     updateProductValidator,
     deleteProductValidator
-}  = require("../utils/Validators/ProductValidators");
+}  = require("../utils/ValidationLayer/Validators/ProductValidators");
 
 // require controllers
 const {
