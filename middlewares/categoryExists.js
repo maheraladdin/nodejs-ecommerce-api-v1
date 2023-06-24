@@ -10,7 +10,7 @@ module.exports = async (req, res, next) => {
     if (category) {
         const categoryExists = await CategoryModel.exists({_id: category});
         if (!categoryExists)
-            return next(new requestError(`category not exists for id: ${category}`, 404));
+            return next(new requestError(`there is no category exists for id: ${category}`, 404));
     }
     next();
 }
