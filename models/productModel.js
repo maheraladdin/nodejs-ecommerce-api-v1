@@ -35,6 +35,8 @@ const productSchema = new mongoose.Schema({
         required: [true, "Price is required"],
         trim: true,
         min: [1, "Price must be at least 1"],
+        minlength: [1, "Price must be at least 1 character long"],
+        maxLength: [32, "Price must be less than 32 characters long"],
     },
     discountedPrice: {
         type: Number,
