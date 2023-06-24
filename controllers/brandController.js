@@ -66,7 +66,7 @@ module.exports.createBrand = asyncHandler(async (req, res) => {
 // @access  Private
 // @params  id
 // @body    name
-module.exports.updateBrand = asyncHandler(async (req, res,next) => {
+module.exports.updateBrandById = asyncHandler(async (req, res,next) => {
     const {name} = req.body;
     const { id } = req.params;
 
@@ -91,7 +91,7 @@ module.exports.updateBrand = asyncHandler(async (req, res,next) => {
 // @desc    Delete a category by id
 // @access  Private
 // @params  id
-module.exports.deleteBrand = asyncHandler(async (req, res,next) => {
+module.exports.deleteBrandById = asyncHandler(async (req, res,next) => {
     const { id } = req.params;
     const brand = await Brand.findByIdAndDelete(id);
 

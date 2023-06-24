@@ -66,7 +66,7 @@ module.exports.createCategory = asyncHandler(async (req, res) => {
 // @access  Private
 // @params  id
 // @body    name
-module.exports.updateCategory = asyncHandler(async (req, res,next) => {
+module.exports.updateCategoryById = asyncHandler(async (req, res,next) => {
     const {name} = req.body;
     const { id } = req.params;
 
@@ -92,7 +92,7 @@ module.exports.updateCategory = asyncHandler(async (req, res,next) => {
 // @access  Private
 // @params  id
 // @usage   /api/v1/categories/5f7f1f7baf4b0b2b7c7c7c7c
-module.exports.deleteCategory = asyncHandler(async (req, res,next) => {
+module.exports.deleteCategoryById = asyncHandler(async (req, res,next) => {
     const { id } = req.params;
     const category = await Category.findByIdAndDelete(id);
 

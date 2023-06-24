@@ -1,13 +1,14 @@
-// Description: Category routes
-
+// Purpose: brand routes
+// require express
 const express = require("express");
+// require router
 const router = express.Router();
 
-// require utils
+// require utils validators
 const { getBrandByIdValidator, createBrandValidator, updateBrandValidator, deleteBrandValidator } = require("../utils/Validators/brandValidators");
 
 // require controllers
-const { getBrands, getBrandById, createBrand, updateBrand, deleteBrand } = require("../controllers/brandController");
+const { getBrands, getBrandById, createBrand, updateBrandById, deleteBrandById } = require("../controllers/brandController");
 
 router.use("/:id/subCategories", require("./subCategoryRoute"));
 
@@ -18,7 +19,7 @@ router.route("/")
 
 router.route("/:id")
     .get(getBrandByIdValidator, getBrandById)
-    .put(updateBrandValidator, updateBrand)
-    .delete(deleteBrandValidator, deleteBrand);
+    .put(updateBrandValidator, updateBrandById)
+    .delete(deleteBrandValidator, deleteBrandById);
 
 module.exports = router;

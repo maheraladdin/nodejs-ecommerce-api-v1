@@ -1,9 +1,11 @@
+// Purpose: subCategory routes
+// require express
 const express = require("express");
-
+// require router
 // mergeParams: true is required to access params from parent router
 const router = express.Router({ mergeParams: true });
 
-// require utils
+// require controllers
 const { createSubCategory,
         setParentCategoryToBody,
         getAllSubCategories,
@@ -12,7 +14,7 @@ const { createSubCategory,
         updateSubCategoryNameAndSubCategoryParentCategoryById,
         deleteSubCategoryById } = require("../controllers/subCategoryController");
 
-// require validators
+// require utils validators
 const { createSubCategoryValidator,
         getSubCategoryByIdValidator,
         updateSubCategoryNameAndSubCategoryParentCategoryByIdValidator,

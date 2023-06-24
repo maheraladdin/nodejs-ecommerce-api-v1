@@ -44,8 +44,8 @@ module.exports.ProductPriceRule = check("price")
     .withMessage("Product price must be a number")
     .isLength({ min: 1 , max: 32})
     .withMessage("Product price must be between 1 and 32 characters long")
-    .isInt({ min: 1 })
-    .withMessage("Product price must be greater than 0");
+    .isFloat({ min: 1.0 })
+    .withMessage("Product price must be greater than 1.0");
 
 // @desc: Rule checks if product discounted price is provided, and is greater than 0
 // @usage: use this Rule inside expressValidatorCallback utility function

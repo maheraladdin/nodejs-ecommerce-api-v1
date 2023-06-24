@@ -13,7 +13,10 @@ module.exports.getProducts = asyncHandler(async (req, res) => {
     const limit = parseInt(req.query.limit) || 5;
     const skip = (page - 1) * limit;
 
-    const products = await Product.find().skip(skip).limit(limit);
+    const products = await Product.find().skip(skip).limit(limit).populate({
+        path: 'category',
+        select: 'name -_id',
+    });
     res.status(200).json({
         status: 'success',
         length: products.length,
@@ -30,7 +33,10 @@ module.exports.getProducts = asyncHandler(async (req, res) => {
 // @params  id
 module.exports.getProductById = asyncHandler(async (req, res,next) => {
     const { id } = req.params;
-    const product = await Product.findById(id);
+    const product = await Product.findById(id).populate({
+        path: 'category',
+        select: 'name -_id',
+    });
     if (!product)
         return next(new requestError(`Product not found for id: ${id}`, 404));
 
@@ -45,7 +51,7 @@ module.exports.getProductById = asyncHandler(async (req, res,next) => {
 // @route   POST /api/v1/products
 // @desc    Create a new product
 // @access  Private
-module.exports.createCategory = asyncHandler(async (req, res) => {
+module.exports.createProduct = asyncHandler(async (req, res) => {
     req.body.slug = slugify(req.body.title);
     const product = await Product.create(req.body);
 
@@ -62,8 +68,8 @@ module.exports.createCategory = asyncHandler(async (req, res) => {
 // @desc    Update a category by id
 // @access  Private
 // @params  id
-module.exports.updateCategory = asyncHandler(async (req, res,next) => {
-    req.body.slug = slugify(req.body.title);
+module.exports.updateProductById = asyncHandler(async (req, res,next) => {
+    req.body.title && (() => req.body.slug = slugify(req.body.title))();
     const { id } = req.params;
 
     const product = await Product.findByIdAndUpdate(id, req.body, { new: true });
@@ -84,7 +90,7 @@ module.exports.updateCategory = asyncHandler(async (req, res,next) => {
 // @desc    Delete a category by id
 // @access  Private
 // @params  id
-module.exports.deleteCategory = asyncHandler(async (req, res,next) => {
+module.exports.deleteProductById = asyncHandler(async (req, res,next) => {
     const { id } = req.params;
     const product = await Product.findByIdAndDelete(id);
 
