@@ -21,16 +21,19 @@ const {
     deleteProductById
 } = require("../controllers/productController");
 
+// require middlewares
+const categoryExists = require("../middlewares/categoryExists");
+
 // routes
 // @route: /api/v1/products
 router.route("/")
     .get(getProducts)
-    .post(createProductValidator, createProduct);
+    .post(createProductValidator, categoryExists, createProduct);
 
 // @route: /api/v1/products/:id
 router.route("/:id")
     .get(getProductByIdValidator, getProductById)
-    .put(updateProductValidator, updateProductById)
+    .put(updateProductValidator, categoryExists, updateProductById)
     .delete(deleteProductValidator, deleteProductById);
 
 module.exports = router;

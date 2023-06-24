@@ -11,23 +11,26 @@ const { createSubCategory,
         getAllSubCategories,
         createFilterObject,
         getSubCategoryById,
-        updateSubCategoryNameAndSubCategoryParentCategoryById,
+        updateSubCategoryById,
         deleteSubCategoryById } = require("../controllers/subCategoryController");
 
 // require utils validators
 const { createSubCategoryValidator,
         getSubCategoryByIdValidator,
-        updateSubCategoryNameAndSubCategoryParentCategoryByIdValidator,
+        updateSubCategoryValidator,
         deleteSubCategoryByIdValidator } = require("../utils/Validators/SubCategoryValidators");
+
+// require middlewares
+const categoryExists = require('../middlewares/categoryExists.js');
 
 // routes
 router.route("/")
-    .post(setParentCategoryToBody, createSubCategoryValidator, createSubCategory)
+    .post(setParentCategoryToBody, createSubCategoryValidator, categoryExists, createSubCategory)
     .get(createFilterObject, getAllSubCategories);
 
 router.route("/:id")
     .get(getSubCategoryByIdValidator, getSubCategoryById)
-    .put(updateSubCategoryNameAndSubCategoryParentCategoryByIdValidator, updateSubCategoryNameAndSubCategoryParentCategoryById)
+    .put(updateSubCategoryValidator, categoryExists, updateSubCategoryById)
     .delete(deleteSubCategoryByIdValidator, deleteSubCategoryById);
 
 

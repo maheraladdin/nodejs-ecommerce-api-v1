@@ -3,6 +3,7 @@ const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const requestError = require("../utils/requestError");
 
+
 // @route   GET /api/v1/products
 // @desc    Get all products
 // @access  Public
@@ -69,14 +70,19 @@ module.exports.createProduct = asyncHandler(async (req, res) => {
 // @access  Private
 // @params  id
 module.exports.updateProductById = asyncHandler(async (req, res,next) => {
+    // if body is empty then return error
+    if (Object.keys(req.body).length === 0)
+        return next(new requestError('Body can not be empty', 400));
+    // if title is updated then update slug
     req.body.title && (() => req.body.slug = slugify(req.body.title))();
+    // get id from params
     const { id } = req.params;
-
+    // find category by id and update
     const product = await Product.findByIdAndUpdate(id, req.body, { new: true });
-
+    // if category not found then return error
     if (!product)
         return next(new requestError(`Product not found for id: ${id}`, 404));
-
+    // else return updated category
     res.status(200).json({
         status: 'success',
         data: {

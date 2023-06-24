@@ -1,12 +1,11 @@
 const SubCategoryModel = require('../models/subCategoryModel.js');
-const CategoryModel = require('../models/categoryModel.js');
 const asyncHandler = require('express-async-handler');
 const requestError = require('../utils/requestError.js');
 const slugify = require('slugify');
 
 // populate parentCategory
-// const populateParentCategory = {
-//     path: 'parentCategory',
+// const populateCategory = {
+//     path: 'category',
 //     select: 'name -_id',
 // };
 
@@ -15,7 +14,7 @@ const slugify = require('slugify');
 // @params  id
 module.exports.createFilterObject = (req, res, next) => {
     const { id } = req.params;
-    req.filter = id ? { parentCategory: id } : {};
+    req.filter = id ? { category: id } : {};
     next();
 }
 
@@ -29,7 +28,7 @@ module.exports.getAllSubCategories = asyncHandler(async (req, res) => {
     const skip = (page - 1) * limit;
 
     const subCategories = await SubCategoryModel.find(req.filter).skip(skip).limit(limit);
-        // .populate(populateParentCategory);
+        // .populate(populateCategory);
 
     res.status(200).json({
         status: 'success',
@@ -65,7 +64,7 @@ module.exports.getSubCategoryById = asyncHandler(async (req, res, next) => {
 // @usage   use this middleware in routes to set parentCategory to id from params if parentCategory doesn't exist in body
 // @params  id
 module.exports.setParentCategoryToBody = async (req,res,next) => {
-    if(!req.body.parentCategory) req.body.parentCategory = req.params.id;
+    if(!req.body.category) req.body.category = req.params.id;
     next();
 }
 
@@ -73,21 +72,15 @@ module.exports.setParentCategoryToBody = async (req,res,next) => {
 // @desc    Create a new subCategory
 // @access  Private
 // @body    name, parentCategory
-module.exports.createSubCategory = asyncHandler(async (req, res, next) => {
+module.exports.createSubCategory = asyncHandler(async (req, res) => {
 
     // get name and parentCategory from body
-    const {name, parentCategory} = req.body;
-
-    // check if parentCategory already exists
-    const parentCategoryExists = await CategoryModel.exists({ _id: parentCategory });
-
-    if (!parentCategoryExists)
-        return next(new requestError(`parent Category not exists for id: ${parentCategory}`, 404));
+    const {name, category} = req.body;
 
     const subCategory = await SubCategoryModel.create({
         name,
         slug: slugify(name),
-        parentCategory
+        category
     });
 
     res.status(201).json({
@@ -104,26 +97,20 @@ module.exports.createSubCategory = asyncHandler(async (req, res, next) => {
 // @access  Private
 // @params  id
 // @body    name, parentCategory
-module.exports.updateSubCategoryNameAndSubCategoryParentCategoryById = asyncHandler(async (req, res, next) => {
-    // get name and parentCategory from body
-    const {name, parentCategory} = req.body;
+module.exports.updateSubCategoryById = asyncHandler(async (req, res, next) => {
+    // check if body is empty
+    if (Object.keys(req.body).length === 0)
+        return next(new requestError('Body is empty you have to send name or category id in body', 400));
+    // get name from body
+    const {name} = req.body;
     // get subcategory id from params
     const { id } = req.params;
 
-    // check if parentCategory already exists
-    const parentCategoryExists = await CategoryModel.exists({ _id: parentCategory });
-
-    if (!parentCategoryExists)
-        return next(new requestError(`there is no Category exists for id: ${parentCategory}`, 404));
+    // if name exists then set slug to slugify(name)
+    if(name) req.body.slug = slugify(name);
 
     // update subCategory
-    const subCategory = await SubCategoryModel.findByIdAndUpdate(
-        id,
-        {
-            name,
-            slug: slugify(name),
-            parentCategory
-        },
+    const subCategory = await SubCategoryModel.findByIdAndUpdate(id, req.body,
         {new: true}
     )
         // .populate(populateParentCategory);
