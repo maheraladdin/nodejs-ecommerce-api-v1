@@ -1,6 +1,9 @@
 const {check} = require("express-validator");
 const categoryExists = require("../CustomValidationRules/categoryExists");
 const DiscountedPriceLessThanPrice = require("../CustomValidationRules/DiscountedPriceLessThanPrice");
+const subCategoryExists = require("../CustomValidationRules/subCategoryExists");
+const brandExists = require("../CustomValidationRules/brandExists");
+const notRedundant = require("../CustomValidationRules/notRedundant");
 
 // @desc: Rule checks if product title is provided, and is between 3 and 50 characters long
 // @usage: use this Rule inside expressValidatorCallback utility function
@@ -65,7 +68,8 @@ module.exports.ProductDiscountedPriceRule = check("discountedPrice")
 module.exports.ProductColorsRule = check("colors")
     .optional()
     .isArray()
-    .withMessage("Product colors must be an array");
+    .withMessage("Product colors must be an array")
+    .customSanitizer(notRedundant);
 
 // @desc: Rule checks if product image cover is provided
 // @usage: use this Rule inside expressValidatorCallback utility function
@@ -78,7 +82,8 @@ module.exports.ProductImageCoverRule = check("imageCover")
 module.exports.ProductImagesRule = check("images")
     .optional()
     .isArray()
-    .withMessage("Product images must be an array");
+    .withMessage("Product images must be an array")
+    .customSanitizer(notRedundant);
 
 // @desc: Rule checks if product category id is valid mongo id
 // @usage: use this Rule inside expressValidatorCallback utility function
@@ -101,15 +106,18 @@ module.exports.ProductSubcategoryIdRule = check("subcategory")
     .optional()
     .isArray()
     .withMessage("Product subcategory must be an array")
+    .customSanitizer(notRedundant)
     .isMongoId()
-    .withMessage("Invalid Subcategory id format");
+    .withMessage("Invalid Subcategory id format")
+    .custom(subCategoryExists);
 
 // @desc: Rule checks if product brand id is valid mongo id
 // @usage: use this Rule inside expressValidatorCallback utility function
 module.exports.ProductBrandIdRule = check("brand")
     .optional()
     .isMongoId()
-    .withMessage("Invalid Brand id format");
+    .withMessage("Invalid Brand id format")
+    .custom(brandExists);
 
 // @desc: Rule checks if product ratingsAverage is provided
 // @usage: use this Rule inside expressValidatorCallback utility function

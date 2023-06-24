@@ -46,7 +46,7 @@ module.exports.createProductValidator = expressValidatorCallback([
 // @desc: Validator for updating product
 // @usage: use this validator in routes to validate product data
 // @note: this validator should be placed before the controller
-module.exports.updateProductValidator = expressValidatorCallback([ProductIdRule, OptionalProductCategoryIdRule]);
+module.exports.updateProductValidator = expressValidatorCallback([ProductIdRule, OptionalProductCategoryIdRule, ProductSubcategoryIdRule, ProductBrandIdRule]);
 
 // @desc: Validator for deleting product
 // @usage: use this validator in routes to validate product id
