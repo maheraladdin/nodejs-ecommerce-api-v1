@@ -1,14 +1,21 @@
 {
   "name": "nodejs-ecommerce-api-v1",
   "version": "1.0.0",
-  "description": "",
+  "description": "Nodejs Ecommerce API v1 with Express, Mongoose, MongoDB, Express-Validator, Morgan, Dotenv, Slugify, Express-Async-Handler",
   "main": "index.js",
   "scripts": {
-    "start:test": "echo \"Error: no test specified\" && exit 1",
-    "start:dev": "nodemon index.js",
-    "start:prod": "NODE_ENV=production node index.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js",
+    "start": "NODE_ENV=production node index.js"
   },
-  "keywords": [],
+  "keywords": [
+    "nodejs",
+    "ecommerce",
+    "api",
+    "express",
+    "mongoose",
+    "mongodb"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
