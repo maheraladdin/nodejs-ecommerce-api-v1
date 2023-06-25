@@ -14,8 +14,7 @@ module.exports = async (values, {req}) => {
         const subCategoriesIds = subCategories.map(subCategory => subCategory._id.toString());
         // loop over subCategory ids and check if they belong to the category
         for(const value of values){
-            if(!subCategoriesIds.includes(value))
-                notBelong.add(value);
+            !subCategoriesIds.includes(value) && notBelong.add(value);
         }
         // if there is subCategories that do not belong to the category then throw error
         if (notBelong.size > 0)

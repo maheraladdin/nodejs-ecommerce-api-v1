@@ -15,8 +15,9 @@ module.exports = async (values) => {
                 notExists.add(value);
         }
         // if there is subCategories that do not exist then throw error
-        if (notExists.size > 0)
+        if (notExists.size > 0) {
             throw new requestError(`there is no subCategory exists for ids: ${[...notExists]}`, 404);
+        }
     }
     return true;
 }
