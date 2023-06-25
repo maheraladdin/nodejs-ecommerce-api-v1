@@ -4,6 +4,7 @@ const DiscountedPriceLessThanPrice = require("../CustomValidationRules/Discounte
 const subCategoryExists = require("../CustomValidationRules/subCategoryExists");
 const brandExists = require("../CustomValidationRules/brandExists");
 const notRedundant = require("../CustomValidationRules/notRedundant");
+const subCategoriesBelongToCategory = require("../CustomValidationRules/subCategoriesBelongToCategory");
 
 // @desc: Rule checks if product title is provided, and is between 3 and 50 characters long
 // @usage: use this Rule inside expressValidatorCallback utility function
@@ -100,16 +101,17 @@ module.exports.OptionalProductCategoryIdRule = check("category")
     .withMessage("Invalid Category id format")
     .custom(categoryExists);
 
-// @desc: Rule checks if product subcategory id is valid mongo id
+// @desc: Rule checks if product subCategories id is valid mongo id
 // @usage: use this Rule inside expressValidatorCallback utility function
-module.exports.ProductSubcategoryIdRule = check("subcategory")
+module.exports.ProductSubcategoryIdRule = check("subCategories")
     .optional()
     .isArray()
     .withMessage("Product subcategory must be an array")
     .customSanitizer(notRedundant)
     .isMongoId()
     .withMessage("Invalid Subcategory id format")
-    .custom(subCategoryExists);
+    .custom(subCategoryExists)
+    .custom(subCategoriesBelongToCategory);
 
 // @desc: Rule checks if product brand id is valid mongo id
 // @usage: use this Rule inside expressValidatorCallback utility function
