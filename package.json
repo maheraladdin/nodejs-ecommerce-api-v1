@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "Nodejs Ecommerce API v1 with Express, Mongoose, MongoDB, Express-Validator, Morgan, Dotenv, Slugify, Express-Async-Handler",
   "main": "index.js",
-  "url": "https://github.com/maheraladdin/nodejs-ecommerce-api-v1.git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maheraladdin/nodejs-ecommerce-api-v1.git",
+    "branch": "main"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
