@@ -1,4 +1,4 @@
-const handleValidationErrorsMW = require("../middlewares/handleValidationErrorsMW");
+const handleValidationErrorsMW = require("../../middlewares/handleValidationErrorsMW");
 
 // @desc: express validator refactoring just send rules and middlewares and get the job done
 // @usage: expressValidatorCallback([Rule_1_Name,Rule_2_Name],[middleware_1,middleware_2])

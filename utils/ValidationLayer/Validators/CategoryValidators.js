@@ -1,4 +1,4 @@
-const expressValidatorCallback = require("../../expressValidatorCallback");
+const expressValidatorCallback = require("../expressValidatorCallback");
 const {CategoryNameRule, CategoryIdRule } = require("../ValidationRules/categoryRules");
 
 // @desc: Validator for getting category by id from request params

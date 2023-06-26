@@ -1,4 +1,15 @@
+/**
+ * @desc    ApiFeatures class to filter, sort, paginate, select fields to return, search with keyword in title and description fields with case-insensitive using regex
+ * @since   monday 26 Jun 2023
+ * @example const apiFeatures = new ApiFeatures(mongooseQuery, queryString);
+ */
 class ApiFeatures {
+    /**
+     * @desc    constructor
+     * @constructor ApiFeatures
+     * @param   {Query} mongooseQuery - The mongoose query object
+     * @param   {object} queryString - The query string object
+     */
     constructor(mongooseQuery, queryString) {
         this.mongooseQuery = mongooseQuery;
         this.queryString = queryString;

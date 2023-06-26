@@ -1,4 +1,4 @@
-const expressValidatorCallback = require("../../expressValidatorCallback");
+const expressValidatorCallback = require("../expressValidatorCallback");
 const {
     ProductNameRule,
     ProductDescriptionRule,
