@@ -9,19 +9,19 @@ npm install
 ## Run dev
 
 ```bash
-npm run start:dev
+npm run dev
 ```
 
 ## Run prod
 
 ```bash
-npm run start:prod
+npm start
 ```
 
 ## Run test
 
 ```bash
-npm run start:test
+npm run tests
 ```
 
 
