@@ -2,6 +2,7 @@ const SubCategoryModel = require('../models/subCategoryModel.js');
 const asyncHandler = require('express-async-handler');
 const requestError = require('../utils/requestError.js');
 const slugify = require('slugify');
+const apiFeatures = require("../utils/apiFeatures");
 
 // populate parentCategory
 // const populateCategory = {
@@ -23,17 +24,28 @@ module.exports.createFilterObject = (req, res, next) => {
 // @access  Public
 // @query   page, limit
 module.exports.getAllSubCategories = asyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-    const skip = (page - 1) * limit;
+    // number of documents in collection
+    const countDocuments = await SubCategoryModel.countDocuments();
 
-    const subCategories = await SubCategoryModel.find(req.filter).skip(skip).limit(limit);
-        // .populate(populateCategory);
+    // Build query
+    const apiFeaturesInstance = new apiFeatures(SubCategoryModel.find(req.filter), req.query)
+        .pagination(countDocuments)
+        .filterByField()
+        .searchWithKeyword()
+        .sortingByFields()
+        .selectFields();
 
+    // destructuring mongooseQuery and paginationResult from apiFeaturesInstance
+    const { paginationResult, mongooseQuery } = apiFeaturesInstance;
+
+    // Execute query
+    const subCategories = await mongooseQuery;
+
+    // Send response
     res.status(200).json({
         status: 'success',
         length: subCategories.length,
-        page,
+        paginationResult,
         data: {
             subCategories,
         },

@@ -8,6 +8,7 @@ class ApiFeatures {
     @desc    filter by fields
     @usage   use this method in controller to filter by fields and operators ($gt, $gte, $lt, $lte, $eq) are supported
     @return  this
+    @since  monday 26 Jun 2023
     */
     filterByField() {
         // filtering
@@ -54,13 +55,24 @@ class ApiFeatures {
      * @usage   use this method in controller to pagination
      * @return  this
      */
-    pagination() {
-        // pagination
+    pagination(countDocuments) {
         const page = parseInt(this.queryString.page) || 1;
         const limit = parseInt(this.queryString.limit) || 5;
         const skip = (page - 1) * limit;
+        const endIndexOfCurrentPage = page * limit;
+
+        // pagination results
+        const paginationDetails = {
+            currentPage: page,
+            nextPage: (endIndexOfCurrentPage < countDocuments) ? page + 1 : null,
+            previousPage: (page > 1) ? page - 1 : null,
+            limit,
+            numberOfPages: Math.ceil(countDocuments / limit),
+        };
+
+
         this.mongooseQuery.skip(skip).limit(limit);
-        // if page is greater than total pages
+        this.paginationResult = paginationDetails;
         return this;
     }
 
@@ -97,6 +109,7 @@ class ApiFeatures {
                 $or: [
                     {title: {$regex: keyword, $options: 'i'}},
                     {description: {$regex: keyword, $options: 'i'}},
+                    {name: {$regex: keyword, $options: 'i'}},
                 ]
             };
             this.mongooseQuery.find(keywordSearchObject);

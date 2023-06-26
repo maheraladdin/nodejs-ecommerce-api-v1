@@ -13,27 +13,31 @@ const apiFeatures = require("../utils/apiFeatures");
  @usage http://localhost:5000/api/v1/products?title[eq]=product1&price[gte]=100&sort=-price&select=title,price&limit=2&page=2&category=5f9a1b7b3b4b0e1f1c9b3b0d
  */
 module.exports.getProducts = asyncHandler(async (req, res) => {
+    // number of documents in collection
+    const countDocuments = await Product.countDocuments();
     // Build query
     const apiFeaturesInstance = new apiFeatures(Product.find(), req.query)
-        .pagination()
+        .pagination(countDocuments)
         .filterByField()
         .searchWithKeyword()
         .sortingByFields()
         .selectFields();
 
     // Execute query
-    const products = await apiFeaturesInstance.mongooseQuery;
+    const { paginationResult, mongooseQuery } = apiFeaturesInstance;
+    const products = await mongooseQuery;
 
     // Send response
     res.status(200).json({
         status: 'success',
         length: products.length,
-        // page,
+        paginationResult,
         data: {
             products,
         },
     });
 });
+
 /**
 @route   GET /api/v1/products/:id
 @desc    Get a product by id
@@ -56,6 +60,7 @@ module.exports.getProductById = asyncHandler(async (req, res,next) => {
         },
     });
 });
+
 /**
 @route   POST /api/v1/products
 @desc    Create a new product
@@ -75,6 +80,7 @@ module.exports.createProduct = asyncHandler(async (req, res) => {
     });
 
 });
+
 /**
 @route   PUT /api/v1/categories/:id
 @desc    Update a category by id
