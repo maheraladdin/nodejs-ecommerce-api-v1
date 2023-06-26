@@ -14,10 +14,7 @@ module.exports.getProducts = getAll(Product);
  * @desc    Get a product by id
  * @access  Public
  */
-module.exports.getProductById = getOne(Product, 'Product', {
-    path: 'category',
-    select: 'name -_id',
-});
+module.exports.getProductById = getOne(Product, 'Product');
 
 /**
  * @route   POST /api/v1/products

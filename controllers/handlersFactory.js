@@ -44,18 +44,13 @@ module.exports.getAll = (Model,kind = "Document") => asyncHandler(async (req, re
  * @access  Public
  * @param  {Model} Model - The model to get from
  * @param  {string} kind - The kind of document
- * @param  {object?: {path: string,select?: string}} populateObject - The field to populate
  */
-module.exports.getOne = (Model,kind = "Document",populateObject) => asyncHandler(async (req, res, next) => {
+module.exports.getOne = (Model,kind = "Document") => asyncHandler(async (req, res, next) => {
     // get id from params
     const { id } = req.params;
 
-    // build query
-    const mongooseQuery = Model.findById(id);
-    if (populateObject) mongooseQuery.populate(populateObject);
-
     // execute query
-    const document = await mongooseQuery;
+    const document = await Model.findById(id);
 
     // check if document exists
     if (!document)
@@ -73,6 +68,7 @@ module.exports.getOne = (Model,kind = "Document",populateObject) => asyncHandler
  */
 const setSlug = (req) => {
     const {name, title} = req.body;
+    if(!name && !title) return;
     req.body.slug = slugify(name || title);
 }
 
