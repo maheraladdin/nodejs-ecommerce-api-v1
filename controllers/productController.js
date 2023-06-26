@@ -33,5 +33,9 @@ module.exports.createProduct = createOne(Product);
  */
 module.exports.updateProductById = updateOne(Product, 'Product');
 
-
+/**
+ * @route   DELETE /api/v1/categories/:id
+ * @desc    Delete a category by id
+ * @access  Private
+ */
 module.exports.deleteProductById = deleteOne(Product,'Product');
