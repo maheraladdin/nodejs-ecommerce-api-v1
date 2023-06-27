@@ -1,5 +1,7 @@
-const SubCategoryModel = require('../models/subCategoryModel.js');
+// Description: Handle subCategory requests.
 const {deleteOne, getAll, getOne, updateOne, createOne} = require("./handlersFactory");
+const SubCategoryModel = require('../models/subCategoryModel.js');
+
 /**
  * @desc    Use in nested get route to set filter object for getting subCategories
  * @param   {object} req - The request object

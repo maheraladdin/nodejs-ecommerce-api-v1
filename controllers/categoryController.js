@@ -1,7 +1,7 @@
 // Description: Handle category requests.
-const Category = require("../models/categoryModel");
 const {deleteOne, getAll, getOne, updateOne, createOne, optimizeImage} = require("./handlersFactory");
 const upload = require("../middlewares/uploadImageMW");
+const Category = require("../models/categoryModel");
 
 
 /**

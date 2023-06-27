@@ -1,3 +1,4 @@
+// Desc: Factory functions for handling requests
 const asyncHandler = require("express-async-handler");
 const RequestError = require("../utils/RequestError");
 const ApiFeatures = require("../utils/ApiFeatures");

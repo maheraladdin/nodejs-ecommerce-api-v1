@@ -1,5 +1,6 @@
-const Product = require("../models/productModel");
+// Description: Handle product requests.
 const { deleteOne, getAll, getOne, updateOne, createOne } = require("./handlersFactory");
+const Product = require("../models/productModel");
 
 /**
  * @route   GET /api/v1/products

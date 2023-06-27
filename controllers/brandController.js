@@ -1,6 +1,8 @@
-const Brand = require("../models/brandModel");
+// Description: Handle brand requests.
 const {deleteOne, getAll, getOne, updateOne, createOne, optimizeImage} = require("./handlersFactory");
 const upload = require("../middlewares/uploadImageMW");
+const Brand = require("../models/brandModel");
+
 /**
  * @route   GET /api/v1/brands
  * @desc    Get all brands
