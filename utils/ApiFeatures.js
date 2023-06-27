@@ -30,10 +30,11 @@ class ApiFeatures {
         removeFields.forEach((field) => delete queryStringFilterObject[field]);
 
         // advanced filtering with operators ($gt, $gte, $lt, $lte, $eq)
+        const pattern = /\b(gt|gte|lt|lte|eq)\b/g;
         const queryStringAdvancedFilterObject = JSON.parse(
             JSON.stringify(queryStringFilterObject)
                 // replace gte, gt, lte, lt with $gte, $gt, $lte, $lt
-                .replace(/\b(gt|gte|lt|lte|eq)\b/g, match => `$${match}`)
+                .replace(pattern, match => `$${match}`)
         );
 
         this.mongooseQuery.find(queryStringAdvancedFilterObject);

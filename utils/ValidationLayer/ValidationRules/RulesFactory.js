@@ -14,9 +14,9 @@ module.exports.optionalRequireLengthRule = (doc,options) => {
 
     const min = options && options.min || 3;
     const max = options && options.max || 50;
-    const requireErrorMsg = `${doc} name is required`;
-    const lengthErrorMsg = `${doc} name must be between ${min} and ${max} characters long`;
     const field = options && options.field || "name";
+    const requireErrorMsg = `${doc} ${field} is required`;
+    const lengthErrorMsg = `${doc} ${field} must be between ${min} and ${max} characters long`;
 
     // build validation chain
     const chain = check(field);
