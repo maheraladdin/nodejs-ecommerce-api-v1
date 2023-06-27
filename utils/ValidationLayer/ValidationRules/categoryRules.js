@@ -1,24 +1,16 @@
-const {check} = require("express-validator");
+const {optionalRequireLengthRule, idRule} = require("./RulesFactory");
 
-// @desc: Rule checks if category name is provided, and is between 3 and 50 characters long
-// @usage: use this Rule inside expressValidatorCallback utility function
-module.exports.CategoryNameRule = check("name")
-    .trim()
-    .notEmpty()
-    .withMessage("Category name is required")
-    .isLength({ min: 3, max: 50 })
-    .withMessage("Category name must be between 3 and 50 characters long");
+/**
+ * @desc: Rule checks if category name is provided, and is between 3 and 50 characters long
+ */
+module.exports.CategoryNameRule = optionalRequireLengthRule("Category");
 
-module.exports.CategoryNameOptionalRule = check("name")
-    .optional()
-    .trim()
-    .notEmpty()
-    .withMessage("Category name is required")
-    .isLength({ min: 3, max: 50 })
-    .withMessage("Category name must be between 3 and 50 characters long");
+/**
+ * @desc: Rule checks optionally if category name is provided, and is between 3 and 50 characters long
+ */
+module.exports.CategoryNameOptionalRule = optionalRequireLengthRule("Category", {optional: true});
 
-// @desc: Rule checks if category id is valid mongo id
-// @usage: use this Rule inside expressValidatorCallback utility function
-module.exports.CategoryIdRule = check("id")
-    .isMongoId()
-    .withMessage("Invalid category id format");
+/**
+ * @desc: Rule checks if category id is valid mongo id
+ */
+module.exports.CategoryIdRule = idRule("Category");
