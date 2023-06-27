@@ -1,6 +1,6 @@
 const Brand = require("../models/brandModel");
-const {deleteOne, getAll, getOne, updateOne, createOne} = require("./handlersFactory");
-
+const {deleteOne, getAll, getOne, updateOne, createOne, optimizeImage} = require("./handlersFactory");
+const upload = require("../middlewares/uploadImageMW");
 /**
  * @route   GET /api/v1/brands
  * @desc    Get all brands
@@ -14,6 +14,19 @@ module.exports.getBrands = getAll(Brand);
  * @access  Public
 */
 module.exports.getBrandById = getOne(Brand,'Brand');
+
+/**
+ * @desc    optimize category image
+ * @type    {object}
+ */
+module.exports.optimizeBrandImage = optimizeImage("Brand",{path: "uploads/brands"});
+
+/**
+ * @desc    Middleware to upload a category image
+ * @type    {object}
+ */
+module.exports.uploadBrandImage = upload.single("image");
+
 
 /**
  * @route   POST /api/v1/brands

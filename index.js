@@ -1,8 +1,10 @@
-// require modules
+// Desc: This file is the entry point of the application
+// require third party modules
 const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 
+// require custom modules
 // require routes
 const categoryRoute = require('./routes/categoryRoute');
 const subCategoryRoute = require('./routes/subCategoryRoute');
@@ -27,11 +29,12 @@ const app = express();
 // use morgan for logging requests in development mode
 process.env.NODE_ENV === "development" && app.use(morgan('dev')) && console.log('Morgan enabled for development');
 
-// @desc: Use this middleware to parse json data from request body
+// use express.json() to parse json data from request body
 app.use(express.json());
-
-// @desc: Use this middleware to parse urlencoded data from request body
+// use express.urlencoded() to parse urlencoded data from request body
 app.use(express.urlencoded({ extended: true }));
+// use express.static() to serve static files
+app.use(express.static('uploads'));
 
 // mainPath
 const mainPath = "/api/v1"

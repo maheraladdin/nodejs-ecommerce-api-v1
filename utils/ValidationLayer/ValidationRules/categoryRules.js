@@ -9,6 +9,14 @@ module.exports.CategoryNameRule = check("name")
     .isLength({ min: 3, max: 50 })
     .withMessage("Category name must be between 3 and 50 characters long");
 
+module.exports.CategoryNameOptionalRule = check("name")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("Category name is required")
+    .isLength({ min: 3, max: 50 })
+    .withMessage("Category name must be between 3 and 50 characters long");
+
 // @desc: Rule checks if category id is valid mongo id
 // @usage: use this Rule inside expressValidatorCallback utility function
 module.exports.CategoryIdRule = check("id")

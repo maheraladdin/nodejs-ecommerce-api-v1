@@ -8,18 +8,18 @@ const router = express.Router();
 const { getBrandByIdValidator, createBrandValidator, updateBrandValidator, deleteBrandValidator } = require("../utils/ValidationLayer/Validators/brandValidators");
 
 // require controllers
-const { getBrands, getBrandById, createBrand, updateBrandById, deleteBrandById } = require("../controllers/brandController");
+const { getBrands, getBrandById, createBrand, updateBrandById, deleteBrandById, uploadBrandImage, optimizeBrandImage } = require("../controllers/brandController");
 
 router.use("/:id/subCategories", require("./subCategoryRoute"));
 
 // routes
 router.route("/")
     .get(getBrands)
-    .post(createBrandValidator, createBrand);
+    .post(createBrandValidator, uploadBrandImage, optimizeBrandImage, createBrand);
 
 router.route("/:id")
     .get(getBrandByIdValidator, getBrandById)
-    .put(updateBrandValidator, updateBrandById)
+    .put(updateBrandValidator, uploadBrandImage, optimizeBrandImage, updateBrandById)
     .delete(deleteBrandValidator, deleteBrandById);
 
 module.exports = router;

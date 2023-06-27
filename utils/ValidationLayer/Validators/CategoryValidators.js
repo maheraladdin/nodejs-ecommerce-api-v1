@@ -1,5 +1,5 @@
 const expressValidatorCallback = require("../expressValidatorCallback");
-const {CategoryNameRule, CategoryIdRule } = require("../ValidationRules/categoryRules");
+const {CategoryNameRule, CategoryNameOptionalRule, CategoryIdRule } = require("../ValidationRules/categoryRules");
 
 // @desc: Validator for getting category by id from request params
 // @usage: use this validator in routes to validate category id
@@ -14,7 +14,7 @@ module.exports.createCategoryValidator = expressValidatorCallback([CategoryNameR
 // @desc: Validator for updating category
 // @usage: use this validator in routes to validate category data
 // @note: this validator should be placed before the controller
-module.exports.updateCategoryValidator = expressValidatorCallback([CategoryIdRule, CategoryNameRule]);
+module.exports.updateCategoryValidator = expressValidatorCallback([CategoryIdRule, CategoryNameOptionalRule]);
 
 // @desc: Validator for deleting category
 // @usage: use this validator in routes to validate category id
