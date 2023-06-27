@@ -13,7 +13,7 @@ const productRoute = require('./routes/productRoute');
 
 // require middlewares
 const errorHandler = require('./middlewares/errorHandlerMW');
-const requestError = require("./utils/requestError");
+const RequestError = require("./utils/RequestError");
 
 // load env variables from config.env
 dotenv.config({ path: './config.env' });
@@ -50,7 +50,7 @@ app.use(`${mainPath}/products`,productRoute);
 // @usage: use this middleware at the end of all routes
 // @note: this middleware should be placed after all routes
 app.all('*',(req,res,next) => {
-    next(new requestError(`Can't find ${req.originalUrl} on this server`, 404))
+    next(new RequestError(`Can't find ${req.originalUrl} on this server`, 404))
 });
 
 // use error handler middleware for handling errors inside express

@@ -1,4 +1,4 @@
-const requestError = require("../utils/requestError");
+const RequestError = require("../utils/RequestError");
 // const { v4: uuidv4 } = require('uuid');
 const multer = require("multer");
 
@@ -54,7 +54,7 @@ const storage = multer.memoryStorage();
  */
 const fileFilter = (req, file, cb) => {
     const isImage = file.mimetype.startsWith("image");
-    const fileTypeError = new requestError("Please upload only images", 400);
+    const fileTypeError = new RequestError("Please upload only images", 400);
     cb(isImage ? null : fileTypeError, isImage);
 }
 

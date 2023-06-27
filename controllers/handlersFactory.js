@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
-const requestError = require("../utils/requestError");
-const apiFeatures = require("../utils/apiFeatures");
+const RequestError = require("../utils/RequestError");
+const ApiFeatures = require("../utils/ApiFeatures");
 const slugify = require("slugify");
 const {v4: uuidv4} = require("uuid");
 const sharp = require("sharp");
@@ -52,16 +52,16 @@ module.exports.getAll = (Model,kind = "Document") => asyncHandler(async (req, re
     // Build query
     const mongooseInitiateQuery = (kind === "SubCategory") ? Model.find(req.filter) : Model.find();
 
-    // Create apiFeatures instance
-    const apiFeaturesInstance = new apiFeatures(mongooseInitiateQuery, req.query)
+    // Create ApiFeatures instance
+    const ApiFeaturesInstance = new ApiFeatures(mongooseInitiateQuery, req.query)
         .pagination(countDocuments)
         .filterByField()
         .searchWithKeyword()
         .sortingByFields()
         .selectFields();
 
-    // destructuring mongooseQuery and paginationResult from apiFeaturesInstance
-    const { paginationResult, mongooseQuery } = apiFeaturesInstance;
+    // destructuring mongooseQuery and paginationResult from ApiFeaturesInstance
+    const { paginationResult, mongooseQuery } = ApiFeaturesInstance;
 
     // Execute query
     const documents = await mongooseQuery;
@@ -90,7 +90,7 @@ module.exports.getOne = (Model,kind = "Document") => asyncHandler(async (req, re
 
     // check if document exists
     if (!document)
-        return next(new requestError(`${kind} not found for id: ${id}`, 404));
+        return next(new RequestError(`${kind} not found for id: ${id}`, 404));
 
     res.status(200).json({
         status: 'success',
@@ -144,7 +144,7 @@ module.exports.updateOne = (Model,kind = "Document") => asyncHandler(async (req,
 
     // check if document exists
     if (!document)
-        return next(new requestError(`${kind} not found for id: ${id}`, 404));
+        return next(new RequestError(`${kind} not found for id: ${id}`, 404));
 
     res.status(200).json({
         status: 'success',
@@ -168,7 +168,7 @@ module.exports.deleteOne = (Model,kind = "Document") => asyncHandler(async (req,
 
     // check if document exists
     if (!document)
-        return next(new requestError(`No ${kind} found for id: ${id}`, 404));
+        return next(new RequestError(`No ${kind} found for id: ${id}`, 404));
 
     res.status(204).send();
 });

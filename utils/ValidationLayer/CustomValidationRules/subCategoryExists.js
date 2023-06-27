@@ -1,5 +1,5 @@
 const SubCategoryModel = require('../../../models/subCategoryModel');
-const requestError = require("../../requestError");
+const RequestError = require("../../RequestError");
 
 module.exports = async (values) => {
     if (values.length > 0) {
@@ -16,7 +16,7 @@ module.exports = async (values) => {
         }
         // if there is subCategories that do not exist then throw error
         if (notExists.size > 0) {
-            throw new requestError(`there is no subCategory exists for ids: ${[...notExists]}`, 404);
+            throw new RequestError(`there is no subCategory exists for ids: ${[...notExists]}`, 404);
         }
     }
     return true;

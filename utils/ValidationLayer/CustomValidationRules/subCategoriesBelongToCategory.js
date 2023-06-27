@@ -1,5 +1,5 @@
 const SubCategoryModel = require('../../../models/subCategoryModel');
-const requestError = require("../../requestError");
+const RequestError = require("../../RequestError");
 
 module.exports = async (values, {req}) => {
     // get category from request body
@@ -18,7 +18,7 @@ module.exports = async (values, {req}) => {
         }
         // if there is subCategories that do not belong to the category then throw error
         if (notBelong.size > 0)
-            throw new requestError(`subCategories: ${[...notBelong]} do not belong to category: ${category}`, 400);
+            throw new RequestError(`subCategories: ${[...notBelong]} do not belong to category: ${category}`, 400);
     }
     return true;
 }
