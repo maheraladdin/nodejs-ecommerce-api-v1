@@ -29,6 +29,8 @@ const app = express();
 // use morgan for logging requests in development mode
 process.env.NODE_ENV === "development" && app.use(morgan('dev')) && console.log('Morgan enabled for development');
 
+// use express middlewares
+
 // use express.json() to parse json data from request body
 app.use(express.json());
 // use express.urlencoded() to parse urlencoded data from request body
@@ -37,18 +39,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('uploads'));
 
 // mainPath
-const mainPath = "/api/v1"
+const mainPath = "/api/v1.0.0";
 
-// @desc: Mount routes
-// @usage: use this middleware to mount routes
+// Mount routes
 app.use(`${mainPath}/categories`,categoryRoute);
 app.use(`${mainPath}/subCategories`,subCategoryRoute);
 app.use(`${mainPath}/brands`,brandRoute);
 app.use(`${mainPath}/products`,productRoute);
 
-// @desc: Error handler middleware for handling all unhandled routes
-// @usage: use this middleware at the end of all routes
-// @note: this middleware should be placed after all routes
+// Error handler middleware for handling all unhandled routes
 app.all('*',(req,res,next) => {
     next(new RequestError(`Can't find ${req.originalUrl} on this server`, 404))
 });
@@ -68,26 +67,28 @@ const server = app.listen(port, () => {
 
 // handling errors outside express
 
-// Event: unhandledRejection
-// Desc: This event is emitted when a Promise is rejected and no error handler is attached to the promise within a turn of the event loop.
-
-process.on('unhandledRejection', (err) => {
+/**
+ * @desc: This function is used to handle unhandled promise rejections and uncaught exceptions
+ * @param {string} msg - message to be displayed
+ * @param {Error} err - error object
+ */
+const exitHandler = (msg, err) => {
     // close server ,then exit process
     server.close(() => {
-        console.log('UNHANDLED REJECTION! Shutting down...');
+        console.log(msg);
         console.log(`Error: ${err.name}, Message: ${err.message} \nStack: ${err.stack}`);
         process.exit(1);
     });
-});
+}
 
-// Event: uncaughtException
-// Desc: This event is emitted when an uncaught JavaScript exception bubbles all the way back to the event loop.
+/**
+ * @desc: This event is emitted when a Promise is rejected and no error handler is attached to the promise within a turn of the event loop.
+ * @event: unhandledRejection
+ */
+process.on('unhandledRejection', (err) => exitHandler('UNHANDLED REJECTION! Shutting down...', err));
 
-process.on('uncaughtException', (err) => {
-    // close server ,then exit process
-    server.close(() => {
-        console.log('UNCAUGHT EXCEPTION! Shutting down...');
-        console.log(`Error: ${err.name}, Message: ${err.message} \nStack: ${err.stack}`);
-        process.exit(1);
-    });
-});
+/**
+ * @desc: This event is emitted when an uncaught JavaScript exception bubbles all the way back to the event loop.
+ * @event: uncaughtException
+ */
+process.on('uncaughtException', (err) => exitHandler('UNCAUGHT EXCEPTION! Shutting down...', err));
