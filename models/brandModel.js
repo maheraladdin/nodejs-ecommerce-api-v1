@@ -1,7 +1,8 @@
-// import mongoose
 const mongoose = require('mongoose');
 
-// (1) create schema
+/**
+ * @desc    brand schema
+ */
 const brandSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -20,5 +21,14 @@ const brandSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// (2) create models
+/**
+ * @desc    mongoose post middleware to add image url to response
+ */
+brandSchema.post(/(init|save)/, function (doc) {
+    if(doc.image) doc.image = `${process.env.HOST}/brands/${doc.image}`;
+});
+
+/**
+ * @desc    create model from schema
+ */
 module.exports = mongoose.model('brands', brandSchema);

@@ -15,11 +15,11 @@ router.use("/:id/subCategories", require("./subCategoryRoute"));
 // routes
 router.route("/")
     .get(getBrands)
-    .post(createBrandValidator, uploadBrandImage, optimizeBrandImage, createBrand);
+    .post(uploadBrandImage, optimizeBrandImage, createBrandValidator, createBrand);
 
 router.route("/:id")
     .get(getBrandByIdValidator, getBrandById)
-    .put(updateBrandValidator, uploadBrandImage, optimizeBrandImage, updateBrandById)
+    .put(uploadBrandImage, optimizeBrandImage, updateBrandValidator, updateBrandById)
     .delete(deleteBrandValidator, deleteBrandById);
 
 module.exports = router;

@@ -1,10 +1,14 @@
 // Desc: Factory functions for handling requests
+
+// require third-party modules
 const asyncHandler = require("express-async-handler");
-const RequestError = require("../utils/RequestError");
-const ApiFeatures = require("../utils/ApiFeatures");
 const slugify = require("slugify");
 const {v4: uuidv4} = require("uuid");
 const sharp = require("sharp");
+
+// require custom modules
+const RequestError = require("../utils/RequestError");
+const ApiFeatures = require("../utils/ApiFeatures");
 
 /**
  * @desc    optimize category image
@@ -21,7 +25,7 @@ module.exports.optimizeImage = (document = "document",options) => asyncHandler(a
 
     // constants for image processing
     const {buffer} = req.file;
-    const imageDimensions = options.imageDimensions || {width: 600, height: 600};
+    const imageDimensions = options.imageDimensions || {width: 600, height: 600}; 
     const quality = options.quality || 90;
     const outputFormat = options.outputFormat || "webp";
     const fileName = `${document}-${uuidv4()}-${Date.now()}.${outputFormat}`;
