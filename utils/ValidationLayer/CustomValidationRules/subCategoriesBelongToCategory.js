@@ -1,6 +1,13 @@
-const SubCategoryModel = require('../../../models/subCategoryModel');
+const SubCategory = require('../../../models/subCategoryModel');
 const RequestError = require("../../RequestError");
 
+/**
+ * @desc Check if subCategories belong to category
+ * @param {string[]} values - subCategories ids
+ * @param {object} req - request object
+ * @type {function(*=, *=): Promise<boolean>}
+ * @return {Promise<boolean>}
+ */
 module.exports = async (values, {req}) => {
     // get category from request body
     const { category } = req.body;
@@ -9,7 +16,7 @@ module.exports = async (values, {req}) => {
         // loop over subCategory ids and check if they belong to the category
         let notBelong = new Set();
         // get all subCategories that belong to the category and ids in request body
-        const subCategories = await SubCategoryModel.find({ _id: {$in: values}, category }).select('_id');
+        const subCategories = await SubCategory.find({ _id: {$in: values}, category }).select('_id');
         // get all subCategories ids that belong to the category
         const subCategoriesIds = subCategories.map(subCategory => subCategory._id.toString());
         // loop over subCategory ids and check if they belong to the category
