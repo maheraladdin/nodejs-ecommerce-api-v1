@@ -23,7 +23,7 @@ module.exports.getCategoryById = getOne(Category,'Category');
  * @desc    optimize category image
  * @type    {object}
  */
-module.exports.optimizeCategoryImage = optimizeImage("Category",{path: "uploads/categories"});
+module.exports.optimizeCategoryImage = optimizeImage("Category");
 
 /**
  * @desc    Middleware to upload a category image

@@ -3,7 +3,7 @@ const { deleteOne, getAll, getOne, updateOne, createOne } = require("./handlersF
 const Product = require("../models/productModel");
 const upload = require("../middlewares/uploadImageMW");
 const sharp = require("sharp");
-const {v4: uuidv4} = require("uuid");
+
 
 /**
  * @route   GET /api/v1/products
@@ -29,7 +29,7 @@ module.exports.uploadImages = upload.fields([
         { name: 'images', maxCount: 5 }
 ]);
 
-module.exports.optimizeImages = (req, res, next) => {
+module.exports.optimizeImages = async (req, res, next) => {
     if(!req.files) return next();
     const { imageCover, images } = req.files;
 
@@ -37,38 +37,31 @@ module.exports.optimizeImages = (req, res, next) => {
     if(imageCover) {
         // fetch buffer
         const imageCoverBuffer = imageCover[0].buffer || images[0].buffer;
-        // generate file name
-        const imageCoverFileName = `Product-image-cover-${uuidv4()}-${Date.now()}.webp`;
-        // generate file path
-        const imageCoverFilePath = `uploads/productImageCovers/${imageCoverFileName}`;
         // optimize image cover
-        sharp(imageCoverBuffer)
+          await sharp(imageCoverBuffer)
             .resize(600, 600)
             .toFormat("webp")
             .webp({quality: 90})
-            .toFile(imageCoverFilePath);
-        // save image name to req.body
-        req.body.imageCover = imageCoverFileName;
+            .toBuffer()
+            .then(imageCoverBufferAfterOptimization => req.body.imageCover = imageCoverBufferAfterOptimization.toString("base64"));
     }
 
     // images optimization
     if(images) {
+        req.body.images = [];
         // fetch buffers
         const imagesArrayBuffer = images.map(image => image.buffer);
-        // generate file names
-        const imagesArrayFileName = images.map( _ => `Product-image-${uuidv4()}-${Date.now()}.webp`);
-        // generate file paths
-        const imagesArrayFilePath = imagesArrayFileName.map(image => `uploads/productImages/${image}`);
-        // optimize images
-        imagesArrayBuffer.map(async (imageBuffer,index) =>
-            await sharp(imageBuffer)
+        // optimize images and save them to req.body
+        for (const imageBuffer of imagesArrayBuffer) {
+            const imageBufferAfterOptimization = await sharp(imageBuffer)
                 .resize(600, 600)
                 .toFormat("webp")
-                .webp({quality: 90})
-                .toFile(imagesArrayFilePath[index])
-        );
-        // save image names to req.body
-        req.body.images = imagesArrayFileName;
+                .webp({quality: 50})
+                .toBuffer();
+            req.body.images.push(imageBufferAfterOptimization.toString("base64"));
+        }
+
+
     }
 
     next();

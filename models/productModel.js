@@ -83,8 +83,9 @@ productSchema.pre(/^find/, function (next) {
 
 // mongoose post middleware
 productSchema.post(/(init|save)/, function (doc) {
-    if(doc.imageCover) doc.imageCover = `${process.env.HOST}/productImageCovers/${doc.imageCover}`;
-    if(doc.images) doc.images = doc.images.map(image => `${process.env.HOST}/productImages/${image}`);
+    const initiateBase64 = "data:image/webp;base64,";
+    if(doc.imageCover) doc.imageCover = initiateBase64 + doc.imageCover;
+    if(doc.images) doc.images = doc.images.map(image => initiateBase64 + image);
 });
 
 // create model

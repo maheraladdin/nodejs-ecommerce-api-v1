@@ -25,7 +25,8 @@ const brandSchema = new mongoose.Schema({
  * @desc    mongoose post middleware to add image url to response
  */
 brandSchema.post(/(init|save)/, function (doc) {
-    if(doc.image) doc.image = `${process.env.HOST}/brands/${doc.image}`;
+    const initiateBase64 = "data:image/webp;base64,";
+    if(doc.image) doc.image = initiateBase64 + doc.image;
 });
 
 /**

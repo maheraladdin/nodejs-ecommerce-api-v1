@@ -21,7 +21,7 @@ module.exports.getBrandById = getOne(Brand,'Brand');
  * @desc    optimize category image
  * @type    {object}
  */
-module.exports.optimizeBrandImage = optimizeImage("Brand",{path: "uploads/brands"});
+module.exports.optimizeBrandImage = optimizeImage("Brand");
 
 /**
  * @desc    Middleware to upload a category image

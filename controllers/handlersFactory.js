@@ -3,7 +3,6 @@
 // require third-party modules
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
-const {v4: uuidv4} = require("uuid");
 const sharp = require("sharp");
 
 // require custom modules
@@ -15,31 +14,26 @@ const ApiFeatures = require("../utils/ApiFeatures");
  * @type    {function}
  * @param   {string} document - The document name
  * @param   {object: {
- *      path: string,
- *      imageDimensions?: {width: number,height: number},
+ *      imageDimensions?: {width?: number,height?: number},
  *      quality?: number,
  *      outputFormat?
  *      }} options - The options for image processing
  */
-module.exports.optimizeImage = (document = "document",options) => asyncHandler(async (req, res, next) => {
+module.exports.optimizeImage = (document = "document",options = {}) => asyncHandler(async (req, res, next) => {
 
     // constants for image processing
     const {buffer} = req.file;
-    const imageDimensions = options.imageDimensions || {width: 600, height: 600}; 
+    const imageDimensions = options.imageDimensions || {width: 600, height: 600};
     const quality = options.quality || 90;
     const outputFormat = options.outputFormat || "webp";
-    const fileName = `${document}-${uuidv4()}-${Date.now()}.${outputFormat}`;
-    const path = `${options.path}/${fileName}`;
 
     // image processing
     await sharp(buffer)
         .resize(imageDimensions.width, imageDimensions.height)
         .toFormat(outputFormat)
         [outputFormat]({quality})
-        .toFile(path);
-
-    // save image name into database
-    req.body.image = fileName;
+        .toBuffer()
+        .then(imageBufferAfterOptimization => req.body.image = imageBufferAfterOptimization.toString("base64"));
 
     next();
 });
