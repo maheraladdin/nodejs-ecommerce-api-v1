@@ -30,31 +30,36 @@ module.exports.uploadImages = upload.fields([
 ]);
 
 module.exports.optimizeImages = (req, res, next) => {
+    if(!req.files) return next();
     const { imageCover, images } = req.files;
 
-    // fetch buffers
-    const imageCoverBuffer = imageCover ? imageCover[0].buffer : images[0].buffer || null;
-    const imagesArrayBuffer = images ? images.map(image => image.buffer) : [];
-
-    // generate file names
-    const imageCoverFileName = imageCover ? `Product-image-cover-${uuidv4()}-${Date.now()}.webp` : null;
-    const imagesArrayFileName = images ? images.map( _ => `Product-image-${uuidv4()}-${Date.now()}.webp`) : [];
-
-    // generate file paths
-    const imageCoverFilePath = imageCover ? `uploads/productImageCovers/${imageCoverFileName}` : null;
-    const imagesArrayFilePath = images ? imagesArrayFileName.map(image => `uploads/productImages/${image}`) : [];
-
-
-    // optimize image cover
-    imageCoverBuffer &&
-        (async () => await sharp(imageCoverBuffer)
+    // image cover optimization
+    if(imageCover) {
+        // fetch buffer
+        const imageCoverBuffer = imageCover[0].buffer || images[0].buffer;
+        // generate file name
+        const imageCoverFileName = `Product-image-cover-${uuidv4()}-${Date.now()}.webp`;
+        // generate file path
+        const imageCoverFilePath = `uploads/productImageCovers/${imageCoverFileName}`;
+        // optimize image cover
+        sharp(imageCoverBuffer)
             .resize(600, 600)
             .toFormat("webp")
             .webp({quality: 90})
-            .toFile(imageCoverFilePath))();
+            .toFile(imageCoverFilePath);
+        // save image name to req.body
+        req.body.imageCover = imageCoverFileName;
+    }
 
-    // optimize images
-    imagesArrayBuffer.length &&
+    // images optimization
+    if(images) {
+        // fetch buffers
+        const imagesArrayBuffer = images.map(image => image.buffer);
+        // generate file names
+        const imagesArrayFileName = images.map( _ => `Product-image-${uuidv4()}-${Date.now()}.webp`);
+        // generate file paths
+        const imagesArrayFilePath = imagesArrayFileName.map(image => `uploads/productImages/${image}`);
+        // optimize images
         imagesArrayBuffer.map(async (imageBuffer,index) =>
             await sharp(imageBuffer)
                 .resize(600, 600)
@@ -62,11 +67,9 @@ module.exports.optimizeImages = (req, res, next) => {
                 .webp({quality: 90})
                 .toFile(imagesArrayFilePath[index])
         );
-
-
-    // save image paths to req.body
-    req.body.imageCover = imageCover ? imageCoverFileName : imagesArrayFileName[0];
-    req.body.images = images && imagesArrayFileName;
+        // save image names to req.body
+        req.body.images = imagesArrayFileName;
+    }
 
     next();
 }
