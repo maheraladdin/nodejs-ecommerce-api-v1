@@ -4,7 +4,6 @@ const Product = require("../models/productModel");
 const upload = require("../middlewares/uploadImageMW");
 const sharp = require("sharp");
 
-
 /**
  * @route   GET /api/v1/products
  * @desc    Get all products
@@ -37,13 +36,18 @@ module.exports.optimizeImages = async (req, res, next) => {
     if(imageCover) {
         // fetch buffer
         const imageCoverBuffer = imageCover[0].buffer || images[0].buffer;
+        // constants for image cover
+        const { width, height } = { width: 2000, height: 1333 };
+        const outputFormat = "webp";
+        const quality = 90;
         // optimize image cover
-          await sharp(imageCoverBuffer)
-            .resize(600, 600)
-            .toFormat("webp")
-            .webp({quality: 90})
-            .toBuffer()
-            .then(imageCoverBufferAfterOptimization => req.body.imageCover = imageCoverBufferAfterOptimization.toString("base64"));
+        const imageCoverBufferAfterOptimization = await sharp(imageCoverBuffer)
+            .resize(width, height)
+            .toFormat(outputFormat)
+            [outputFormat]({quality})
+            .toBuffer();
+
+        req.body.imageCover = imageCoverBufferAfterOptimization.toString("base64");
     }
 
     // images optimization
@@ -51,12 +55,16 @@ module.exports.optimizeImages = async (req, res, next) => {
         req.body.images = [];
         // fetch buffers
         const imagesArrayBuffer = images.map(image => image.buffer);
+        // constants for image cover
+        const { width, height } = { width: 2000, height: 1333 };
+        const outputFormat = "webp";
+        const quality = 90;
         // optimize images and save them to req.body
         for (const imageBuffer of imagesArrayBuffer) {
             const imageBufferAfterOptimization = await sharp(imageBuffer)
-                .resize(600, 600)
-                .toFormat("webp")
-                .webp({quality: 50})
+                .resize(width, height)
+                .toFormat(outputFormat)
+                [outputFormat]({quality})
                 .toBuffer();
             req.body.images.push(imageBufferAfterOptimization.toString("base64"));
         }

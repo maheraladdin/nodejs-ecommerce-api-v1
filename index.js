@@ -35,11 +35,9 @@ process.env.NODE_ENV === "development" && app.use(morgan('dev')) && console.log(
 app.use(express.json());
 // use express.urlencoded() to parse urlencoded data from request body
 app.use(express.urlencoded({ extended: true }));
-// use express.static() to serve static files
-app.use(express.static('uploads'));
 
 // mainPath
-const mainPath = "/api/v1.0.0";
+const mainPath = "/api/v1";
 
 // Mount routes
 app.use(`${mainPath}/categories`,categoryRoute);

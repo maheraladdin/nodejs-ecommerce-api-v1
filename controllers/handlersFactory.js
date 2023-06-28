@@ -28,12 +28,13 @@ module.exports.optimizeImage = (document = "document",options = {}) => asyncHand
     const outputFormat = options.outputFormat || "webp";
 
     // image processing
-    await sharp(buffer)
+    const imageBufferAfterOptimization = await sharp(buffer)
         .resize(imageDimensions.width, imageDimensions.height)
         .toFormat(outputFormat)
         [outputFormat]({quality})
-        .toBuffer()
-        .then(imageBufferAfterOptimization => req.body.image = imageBufferAfterOptimization.toString("base64"));
+        .toBuffer();
+
+    req.body.image = imageBufferAfterOptimization.toString("base64");
 
     next();
 });
