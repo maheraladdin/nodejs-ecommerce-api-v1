@@ -81,5 +81,11 @@ productSchema.pre(/^find/, function (next) {
     next();
 });
 
+// mongoose post middleware
+productSchema.post(/(init|save)/, function (doc) {
+    if(doc.imageCover) doc.imageCover = `${process.env.HOST}/productImageCovers/${doc.imageCover}`;
+    if(doc.images) doc.images = doc.images.map(image => `${process.env.HOST}/productImages/${image}`);
+});
+
 // create model
 module.exports = mongoose.model("products", productSchema);

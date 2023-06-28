@@ -18,19 +18,21 @@ const {
     getProductById,
     createProduct,
     updateProductById,
-    deleteProductById
+    deleteProductById,
+    uploadImages,
+    optimizeImages
 } = require("../controllers/productController");
 
 // routes
 // @route: /api/v1/products
 router.route("/")
     .get(getProducts)
-    .post(createProductValidator, createProduct);
+    .post(uploadImages, optimizeImages, createProductValidator, createProduct);
 
 // @route: /api/v1/products/:id
 router.route("/:id")
     .get(getProductByIdValidator, getProductById)
-    .put(updateProductValidator, updateProductById)
+    .put(uploadImages, optimizeImages, updateProductValidator, updateProductById)
     .delete(deleteProductValidator, deleteProductById);
 
 module.exports = router;

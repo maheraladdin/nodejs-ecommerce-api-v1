@@ -1,6 +1,9 @@
 // Description: Handle product requests.
 const { deleteOne, getAll, getOne, updateOne, createOne } = require("./handlersFactory");
 const Product = require("../models/productModel");
+const upload = require("../middlewares/uploadImageMW");
+const sharp = require("sharp");
+const {v4: uuidv4} = require("uuid");
 
 /**
  * @route   GET /api/v1/products
@@ -16,6 +19,57 @@ module.exports.getProducts = getAll(Product);
  * @access  Public
  */
 module.exports.getProductById = getOne(Product, 'Product');
+
+/**
+ * @route   POST /api/v1/products/uploadImageCover
+ * @desc    Upload a product image cover
+ */
+module.exports.uploadImages = upload.fields([
+        { name: 'imageCover', maxCount: 1 },
+        { name: 'images', maxCount: 5 }
+]);
+
+module.exports.optimizeImages = (req, res, next) => {
+    const { imageCover, images } = req.files;
+
+    // fetch buffers
+    const imageCoverBuffer = imageCover ? imageCover[0].buffer : images[0].buffer || null;
+    const imagesArrayBuffer = images ? images.map(image => image.buffer) : [];
+
+    // generate file names
+    const imageCoverFileName = imageCover ? `Product-image-cover-${uuidv4()}-${Date.now()}.webp` : null;
+    const imagesArrayFileName = images ? images.map( _ => `Product-image-${uuidv4()}-${Date.now()}.webp`) : [];
+
+    // generate file paths
+    const imageCoverFilePath = imageCover ? `uploads/productImageCovers/${imageCoverFileName}` : null;
+    const imagesArrayFilePath = images ? imagesArrayFileName.map(image => `uploads/productImages/${image}`) : [];
+
+
+    // optimize image cover
+    imageCoverBuffer &&
+        (async () => await sharp(imageCoverBuffer)
+            .resize(600, 600)
+            .toFormat("webp")
+            .webp({quality: 90})
+            .toFile(imageCoverFilePath))();
+
+    // optimize images
+    imagesArrayBuffer.length &&
+        imagesArrayBuffer.map(async (imageBuffer,index) =>
+            await sharp(imageBuffer)
+                .resize(600, 600)
+                .toFormat("webp")
+                .webp({quality: 90})
+                .toFile(imagesArrayFilePath[index])
+        );
+
+
+    // save image paths to req.body
+    req.body.imageCover = imageCover ? imageCoverFileName : imagesArrayFileName[0];
+    req.body.images = images && imagesArrayFileName;
+
+    next();
+}
 
 /**
  * @route   POST /api/v1/products
