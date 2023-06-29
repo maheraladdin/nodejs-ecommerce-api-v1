@@ -28,6 +28,18 @@ module.exports.uploadImages = upload.fields([
         { name: 'images', maxCount: 5 }
 ]);
 
+/**
+ * @desc    optimize product image cover and images
+ * @param   {object} req - request object
+ * @param   {object} req.files - files object
+ * @param   {object} req.files.imageCover - image cover from multer
+ * @param   {object} req.files.images - images from multer
+ * @param   {object} req.body - body object
+ * @param   {object} req.body.imageCover - image cover
+ * @param   {object} req.body.images - images
+ * @param   {object} res - response object
+ * @param   {function} next - move to next middleware
+ */
 module.exports.optimizeImages = async (req, res, next) => {
     if(!req.files) return next();
     const { imageCover, images } = req.files;
