@@ -51,4 +51,9 @@ module.exports.updateUserById = updateOne(User, "User");
  * @desc    Delete a User by id
  * @access  Private
  */
-module.exports.deleteUserById = deleteOne(User, "User");
+module.exports.deleteUserById = async (req, res, next) => {
+    const stateOfDeletion = req.get("stateOfDeletion");
+    if(!(stateOfDeletion === "soft")) return deleteOne(User,"User")(req,res,next);
+    req.body.active = false;
+    updateOne(User,"User")(req,res,next);
+}

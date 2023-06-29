@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const defaultProfileImg = "https://fakeimg.pl/600x400?text=profile+photo";
+
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -24,7 +26,7 @@ const userSchema = new mongoose.Schema({
     },
     profileImg: {
         type: String,
-        default: "https://fakeimg.pl/600x400?text=profile+photo"
+        default: defaultProfileImg
     },
     password: {
         type: String,
@@ -43,6 +45,12 @@ const userSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true,
+});
+
+userSchema.post(/(init|save)/, function (doc) {
+    if (doc.profileImg === defaultProfileImg) return;
+    const initiateBase64 = "data:image/webp;base64,";
+    if(doc.profileImg) doc.profileImg = initiateBase64 + doc.profileImg;
 });
 
 module.exports = mongoose.model('User', userSchema);
