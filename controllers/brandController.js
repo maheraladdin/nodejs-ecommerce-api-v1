@@ -18,13 +18,13 @@ module.exports.getBrands = getAll(Brand);
 module.exports.getBrandById = getOne(Brand,'Brand');
 
 /**
- * @desc    optimize category image
+ * @desc    optimize brand image
  * @type    {object}
  */
-module.exports.optimizeBrandImage = optimizeImage("Brand");
+module.exports.optimizeBrandImage = optimizeImage();
 
 /**
- * @desc    Middleware to upload a category image
+ * @desc    Middleware to upload a brand image
  * @type    {object}
  */
 module.exports.uploadBrandImage = upload.single("image");
@@ -45,8 +45,8 @@ module.exports.createBrand = createOne(Brand);
 module.exports.updateBrandById = updateOne(Brand, "Brand");
 
 /**
- * @route   DELETE /api/v1/categories/:id
- * @desc    Delete a category by id
+ * @route   DELETE /api/v1/brands/:id
+ * @desc    Delete a brand by id
  * @access  Private
 */
 module.exports.deleteBrandById = deleteOne(Brand, "Brand");

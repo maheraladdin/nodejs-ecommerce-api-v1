@@ -12,15 +12,16 @@ const ApiFeatures = require("../utils/ApiFeatures");
 /**
  * @desc    optimize category image
  * @type    {function}
- * @param   {string} document - The document name
  * @param   {object: {
  *      imageDimensions?: {width?: number,height?: number},
  *      quality?: number,
- *      outputFormat?
+ *      outputFormat?,
+ *      bodyField?: string
  *      }} options - The options for image processing
  */
-module.exports.optimizeImage = (document = "document",options = {}) => asyncHandler(async (req, res, next) => {
-
+module.exports.optimizeImage = (options = {}) => asyncHandler(async (req, res, next) => {
+    // check if there is no file property in request
+    if(!req.file) return next();
     // constants for image processing
     const {buffer} = req.file;
     const imageDimensions = options.imageDimensions || {width: 600, height: 600};
@@ -34,7 +35,11 @@ module.exports.optimizeImage = (document = "document",options = {}) => asyncHand
         [outputFormat]({quality})
         .toBuffer();
 
-    req.body.image = imageBufferAfterOptimization.toString("base64");
+    // constants for request body
+    const bodyField = options.bodyField || "image";
+
+    // save optimized image to request body
+    req.body[bodyField] = imageBufferAfterOptimization.toString("base64");
 
     next();
 });
