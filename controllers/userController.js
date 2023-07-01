@@ -42,7 +42,7 @@ module.exports.createUser = createOne(User);
  * @desc    Update a User by id (you can't update password, active, role properties with this route)
  * @access  Private
  */
-module.exports.updateUserById = updateOne(User, "User", {deleteFromRequestBody: ["role", "active", "password", "passwordConfirmation"]});
+module.exports.updateUserById = updateOne(User, "User", {deleteFromRequestBody: ["password", "passwordConfirmation"]});
 
 /**
  * @route   PUT /api/v1/users/change-password/:id

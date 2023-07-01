@@ -144,7 +144,6 @@ module.exports.createOne = (Model) => asyncHandler(async (req, res) => {
  */
 module.exports.updateOne = (Model,kind = "Document",options) => asyncHandler(async (req, res, next) => {
 
-    console.log(req.body);
     // check if there is options
     if(options) {
         // delete fields from request body if exists in options.deleteFromRequestBody
@@ -164,15 +163,8 @@ module.exports.updateOne = (Model,kind = "Document",options) => asyncHandler(asy
             // hash password
             const salt = bcrypt.genSaltSync(10);
             req.body.password = bcrypt.hashSync(req.body.password, salt);
-
-            res.status(200).json({
-                status: 'success',
-                message: "Password changed successfully",
-            });
         }
     }
-
-    console.log(req.body);
 
     // set slug
     await setSlug(req);

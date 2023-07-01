@@ -83,17 +83,5 @@ const passwordHash = function (next) {
 
 userSchema.pre("save", passwordHash);
 
-/**
- * @desc: Mongoose method to check if current password is correct
- * @param {string} currentPassword - current password
- * @param {string} id - user id
- * @return {boolean} - true if current password is correct, false otherwise
- * @type {function}
- */
-userSchema.statics.isCurrentPassword = async function (currentPassword,id) {
-    const userPasswordInDb = await this.findById(id).select("+password");
-    return bcrypt.compareSync(currentPassword, userPasswordInDb.password);
-}
-
 module.exports = mongoose.model('User', userSchema);
 
