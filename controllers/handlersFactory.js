@@ -4,6 +4,7 @@
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const sharp = require("sharp");
+const bcrypt = require("bcrypt");
 
 // require custom modules
 const RequestError = require("../utils/RequestError");
@@ -136,8 +137,43 @@ module.exports.createOne = (Model) => asyncHandler(async (req, res) => {
  * @access  Private
  * @param  {Model} Model - The model to update from
  * @param  {string} kind - The kind of document
+ * @param  {object?} options - The options for update
+ * @param  {string[]?} options.deleteFromRequestBody - The fields to delete from request body
+ * @param  {string[]?} options.selectFromRequestBody - The fields to select from request body
+ * @param  {boolean?} options.changePassword - The flag to change password
  */
-module.exports.updateOne = (Model,kind = "Document") => asyncHandler(async (req, res, next) => {
+module.exports.updateOne = (Model,kind = "Document",options) => asyncHandler(async (req, res, next) => {
+
+    console.log(req.body);
+    // check if there is options
+    if(options) {
+        // delete fields from request body if exists in options.deleteFromRequestBody
+        if(options.deleteFromRequestBody) {
+            options.deleteFromRequestBody.forEach(field => delete req.body[field]);
+        }
+
+        // select fields from request body if exists in options.selectFromRequestBody
+        if(options.selectFromRequestBody) {
+            const fields = Object.keys(req.body);
+            options.selectFromRequestBody.forEach(field => {
+                if(!fields.includes(field)) delete req.body[field];
+            });
+        }
+
+        if(options.changePassword) {
+            // hash password
+            const salt = bcrypt.genSaltSync(10);
+            req.body.password = bcrypt.hashSync(req.body.password, salt);
+
+            res.status(200).json({
+                status: 'success',
+                message: "Password changed successfully",
+            });
+        }
+    }
+
+    console.log(req.body);
+
     // set slug
     await setSlug(req);
 

@@ -17,19 +17,17 @@ module.exports.getUsers = getAll(User);
  */
 module.exports.getUserById = getOne(User,'User');
 
-
-const bodyField = "profileImg";
 /**
  * @desc    optimize User profileImg
  * @type    {object}
  */
-module.exports.optimizeUserProfileImg = optimizeImage({bodyField});
+module.exports.optimizeUserProfileImg = optimizeImage({bodyField: "profileImg"});
 
 /**
  * @desc    Middleware to upload a User profileImg
  * @type    {object}
  */
-module.exports.uploadUserProfileImg = upload.single(bodyField);
+module.exports.uploadUserProfileImg = upload.single("profileImg");
 
 
 /**
@@ -41,10 +39,17 @@ module.exports.createUser = createOne(User);
 
 /**
  * @route   PUT /api/v1/users/:id
- * @desc    Update a User by id
+ * @desc    Update a User by id (you can't update password, active, role properties with this route)
  * @access  Private
  */
-module.exports.updateUserById = updateOne(User, "User");
+module.exports.updateUserById = updateOne(User, "User", {deleteFromRequestBody: ["role", "active", "password", "passwordConfirmation"]});
+
+/**
+ * @route   PUT /api/v1/users/change-password/:id
+ * @desc    Update a User password by id
+ * @type   {object}
+ */
+module.exports.updateUserPassword = updateOne(User, "User", {selectFromRequestBody: ["password", "passwordConfirmation"], changePassword: true});
 
 /**
  * @route   DELETE /api/v1/users/:id

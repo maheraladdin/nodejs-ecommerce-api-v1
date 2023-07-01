@@ -5,10 +5,10 @@ const express = require("express");
 const router = express.Router();
 
 // require utils validators
-const { getUserByIdValidator, createUserValidator, updateUserValidator, deleteUserValidator } = require("../utils/ValidationLayer/Validators/UserValidators");
+const { getUserByIdValidator, createUserValidator, updateUserValidator, updateUserPasswordValidator, deleteUserValidator } = require("../utils/ValidationLayer/Validators/UserValidators");
 
 // require controllers
-const { getUsers, getUserById, createUser, updateUserById, deleteUserById, uploadUserProfileImg, optimizeUserProfileImg } = require("../controllers/UserController");
+const { getUsers, getUserById, createUser, updateUserById, deleteUserById, uploadUserProfileImg, optimizeUserProfileImg, updateUserPassword } = require("../controllers/UserController");
 
 // routes
 router.route("/")
@@ -19,5 +19,8 @@ router.route("/:id")
     .get(getUserByIdValidator, getUserById)
     .put(uploadUserProfileImg, optimizeUserProfileImg, updateUserValidator, updateUserById)
     .delete(deleteUserValidator, deleteUserById);
+
+router.route("/change-password/:id")
+    .put(updateUserPasswordValidator, updateUserPassword);
 
 module.exports = router;

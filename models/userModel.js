@@ -1,6 +1,10 @@
+// Description: User model based on mongoose schema
+// Require third-party modules
 const mongoose = require('mongoose');
-const defaultProfileImg = "https://fakeimg.pl/600x400?text=profile+photo";
 const bcrypt = require('bcrypt');
+
+// Constants
+const defaultProfileImg = "https://fakeimg.pl/600x400?text=profile+photo";
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -77,7 +81,19 @@ const passwordHash = function (next) {
     next();
 }
 
-userSchema.pre('save', passwordHash);
+userSchema.pre("save", passwordHash);
+
+/**
+ * @desc: Mongoose method to check if current password is correct
+ * @param {string} currentPassword - current password
+ * @param {string} id - user id
+ * @return {boolean} - true if current password is correct, false otherwise
+ * @type {function}
+ */
+userSchema.statics.isCurrentPassword = async function (currentPassword,id) {
+    const userPasswordInDb = await this.findById(id).select("+password");
+    return bcrypt.compareSync(currentPassword, userPasswordInDb.password);
+}
 
 module.exports = mongoose.model('User', userSchema);
 

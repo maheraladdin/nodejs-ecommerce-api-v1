@@ -4,6 +4,7 @@ const emailExists = require("../CustomValidationRules/emailExists");
 const emailNormalize = require("../CustomValidationRules/emailNormlize");
 const phoneExists = require("../CustomValidationRules/phoneExists");
 const passwordConfirmation = require("../CustomValidationRules/passwordConfirmation");
+const checkCurrentPassword = require("../CustomValidationRules/checkCurrentPassword");
 
 /**
  * @desc: Rule checks if Username is provided, and is between 3 and 50 characters long
@@ -40,6 +41,15 @@ module.exports.OptionalUserEmailRule = check("email")
     .custom(emailExists);
 
 /**
+ * @desc: Rule checks if User current password is provided and is exists in database
+ */
+module.exports.UserCurrentPasswordRule = check("currentPassword")
+    .trim()
+    .notEmpty()
+    .withMessage("Please provide your current password")
+    .custom(checkCurrentPassword);
+
+/**
  * @desc: Rule checks password confirmation
  */
 module.exports.UserPasswordConfirmationRule = check("passwordConfirmation")
@@ -51,18 +61,6 @@ module.exports.UserPasswordConfirmationRule = check("passwordConfirmation")
  * @desc: Rule checks if User password is provided, and is between 6 and 50 characters long
  */
 module.exports.UserPasswordRule = check("password")
-    .trim()
-    .notEmpty()
-    .withMessage("Please provide a password")
-    .isStrongPassword({minLength: 6})
-    .withMessage("Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, one number and one symbol")
-    .custom(passwordConfirmation);
-
-/**
- * @desc: Rule checks optionally if User password is provided, and is between 6 and 50 characters long
- */
-module.exports.OptionalUserPasswordRule = check("password")
-    .optional()
     .trim()
     .notEmpty()
     .withMessage("Please provide a password")
