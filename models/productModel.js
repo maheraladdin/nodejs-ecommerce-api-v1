@@ -72,21 +72,34 @@ const productSchema = new mongoose.Schema({
     }
 }, {timestamps: true});
 
-// mongoose query middleware
-productSchema.pre(/^find/, function (next) {
+/**
+ * @desc    mongoose pre middleware to populate category
+ * @param   {Function} next - next middleware
+ */
+const populateCategories = function (next) {
     this.populate({
         path: "category",
         select: "name -_id",
     });
     next();
-});
+}
 
-// mongoose post middleware
-productSchema.post(/(init|save)/, function (doc) {
+productSchema.pre(/^find/, populateCategories);
+
+/**
+ * @desc    mongoose post middleware to add initiate base64 to imageCover and images
+ * @param   {Object} doc - document object
+ * @param   {string} doc.imageCover - imageCover url
+ * @param   {string[]} doc.images - images url
+ * @return  {void}
+ */
+const setInitiateBase64 = function (doc) {
     const initiateBase64 = "data:image/webp;base64,";
     if(doc.imageCover) doc.imageCover = initiateBase64 + doc.imageCover;
     if(doc.images) doc.images = doc.images.map(image => initiateBase64 + image);
-});
+}
+
+productSchema.post(/(init|save)/, setInitiateBase64);
 
 // create model
 module.exports = mongoose.model("products", productSchema);

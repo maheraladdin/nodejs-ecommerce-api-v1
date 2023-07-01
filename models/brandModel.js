@@ -22,12 +22,16 @@ const brandSchema = new mongoose.Schema({
 });
 
 /**
- * @desc    mongoose post middleware to add image url to response
+ * @desc    Mongoose post middleware to add initiateBase64 to image
+ * @param   {object} doc - document object
+ * @param   {string} doc.image - Category image
  */
-brandSchema.post(/(init|save)/, function (doc) {
+const setInitiateBase64 = function (doc) {
     const initiateBase64 = "data:image/webp;base64,";
     if(doc.image) doc.image = initiateBase64 + doc.image;
-});
+}
+
+brandSchema.post(/(init|save)/, setInitiateBase64);
 
 /**
  * @desc    create model from schema

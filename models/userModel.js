@@ -1,12 +1,14 @@
 const mongoose = require('mongoose');
-
 const defaultProfileImg = "https://fakeimg.pl/600x400?text=profile+photo";
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, 'A user must have a name'],
-        trim: true
+        trim: true,
+        minLength: [3, 'Name must be at least 3 characters'],
+        maxLength: [50, 'Name must be at most 50 characters']
     },
     slug: {
         type: String,
@@ -18,7 +20,6 @@ const userSchema = new mongoose.Schema({
         required: [true, 'A user must have an email'],
         unique: true,
         trim: true,
-        lowercase: true,
     },
     phone: {
         type: String,
@@ -47,11 +48,36 @@ const userSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-userSchema.post(/(init|save)/, function (doc) {
+
+/**
+ * @desc: Mongoose post middleware to add initiateBase64 to profileImg if it's not defaultProfileImg
+ * @param {object} doc - document object
+ * @param {string} doc.profileImg - User profile image
+ */
+const setInitiateBase64 = function (doc) {
     if (doc.profileImg === defaultProfileImg) return;
     const initiateBase64 = "data:image/webp;base64,";
     if(doc.profileImg) doc.profileImg = initiateBase64 + doc.profileImg;
-});
+}
+
+userSchema.post(/(init|save)/, setInitiateBase64);
+
+/**
+ * @desc: Mongoose pre middleware to hash password with bcrypt before saving it to database if it's modified
+ * @param {function} next - next function
+ * @return {*} - next function
+ */
+const passwordHash = function (next) {
+    // if password is not modified, skip this middleware
+    if(!this.isModified('password')) return next();
+    // Hash password with bcrypt
+    const salt = bcrypt.genSaltSync(10);
+    this.password = bcrypt.hashSync(this.password, salt);
+
+    next();
+}
+
+userSchema.pre('save', passwordHash);
 
 module.exports = mongoose.model('User', userSchema);
 
