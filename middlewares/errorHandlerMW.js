@@ -11,7 +11,7 @@ const RequestError = require("../utils/RequestError");
  * @param {object} req - request object
  * @param {object} res - response object
  * @param {function} next - next function
- * @ignore next
+ * @ignore next - have to pass next function to use this middleware as error handler
  */
 module.exports = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
