@@ -17,16 +17,18 @@ const {
     uploadCategoryImage,
     optimizeCategoryImage} = require("../controllers/categoryController");
 
+const { protect } = require("../controllers/authController");
+
 router.use("/:id/subCategories", require("./subCategoryRoute"));
 
 // routes
 router.route("/")
     .get(getCategories)
-    .post(uploadCategoryImage, optimizeCategoryImage, createCategoryValidator, createCategory);
+    .post(protect, uploadCategoryImage, optimizeCategoryImage, createCategoryValidator, createCategory);
 
 router.route("/:id")
     .get(getCategoryByIdValidator, getCategoryById)
-    .put(uploadCategoryImage, optimizeCategoryImage, updateCategoryValidator, updateCategoryById)
-    .delete(deleteCategoryValidator, deleteCategoryById);
+    .put(protect, uploadCategoryImage, optimizeCategoryImage, updateCategoryValidator, updateCategoryById)
+    .delete(protect, deleteCategoryValidator, deleteCategoryById);
 
 module.exports = router;

@@ -11,6 +11,7 @@ const subCategoryRoute = require('./routes/subCategoryRoute');
 const brandRoute = require('./routes/brandRoute');
 const productRoute = require('./routes/productRoute');
 const userRoute = require('./routes/userRoute');
+const authRoute = require('./routes/authRoute');
 
 // require middlewares
 const errorHandler = require('./middlewares/errorHandlerMW');
@@ -46,6 +47,7 @@ app.use(`${mainPath}/subCategories`,subCategoryRoute);
 app.use(`${mainPath}/brands`,brandRoute);
 app.use(`${mainPath}/products`,productRoute);
 app.use(`${mainPath}/users`,userRoute);
+app.use(`${mainPath}/auth`,authRoute);
 
 // Error handler middleware for handling all unhandled routes
 app.all('*',(req,res,next) => {

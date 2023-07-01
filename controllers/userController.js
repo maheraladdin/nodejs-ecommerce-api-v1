@@ -49,7 +49,7 @@ module.exports.updateUserById = updateOne(User, "User", {deleteFromRequestBody: 
  * @desc    Update a User password by id
  * @type   {object}
  */
-module.exports.updateUserPassword = updateOne(User, "User", {selectFromRequestBody: ["password", "passwordConfirmation"], changePassword: true});
+module.exports.updateUserPassword = updateOne(User, "User", {selectFromRequestBody: ["password", "passwordConfirmation"], hashPassword: true});
 
 /**
  * @route   DELETE /api/v1/users/:id

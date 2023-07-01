@@ -10,16 +10,19 @@ const { getBrandByIdValidator, createBrandValidator, updateBrandValidator, delet
 // require controllers
 const { getBrands, getBrandById, createBrand, updateBrandById, deleteBrandById, uploadBrandImage, optimizeBrandImage } = require("../controllers/brandController");
 
+// require auth controllers
+const { protect } = require("../controllers/authController");
+
 router.use("/:id/subCategories", require("./subCategoryRoute"));
 
 // routes
 router.route("/")
     .get(getBrands)
-    .post(uploadBrandImage, optimizeBrandImage, createBrandValidator, createBrand);
+    .post(protect, uploadBrandImage, optimizeBrandImage, createBrandValidator, createBrand);
 
 router.route("/:id")
     .get(getBrandByIdValidator, getBrandById)
-    .put(uploadBrandImage, optimizeBrandImage, updateBrandValidator, updateBrandById)
-    .delete(deleteBrandValidator, deleteBrandById);
+    .put(protect, uploadBrandImage, optimizeBrandImage, updateBrandValidator, updateBrandById)
+    .delete(protect, deleteBrandValidator, deleteBrandById);
 
 module.exports = router;

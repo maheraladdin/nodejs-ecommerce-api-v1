@@ -10,15 +10,18 @@ const { getUserByIdValidator, createUserValidator, updateUserValidator, updateUs
 // require controllers
 const { getUsers, getUserById, createUser, updateUserById, deleteUserById, uploadUserProfileImg, optimizeUserProfileImg, updateUserPassword } = require("../controllers/UserController");
 
+// require auth controllers
+const { protect } = require("../controllers/authController");
+
 // routes
 router.route("/")
-    .get(getUsers)
-    .post(uploadUserProfileImg, optimizeUserProfileImg, createUserValidator, createUser);
+    .get(protect, getUsers)
+    .post(protect, uploadUserProfileImg, optimizeUserProfileImg, createUserValidator, createUser);
 
 router.route("/:id")
-    .get(getUserByIdValidator, getUserById)
-    .put(uploadUserProfileImg, optimizeUserProfileImg, updateUserValidator, updateUserById)
-    .delete(deleteUserValidator, deleteUserById);
+    .get(protect, getUserByIdValidator, getUserById)
+    .put(protect, uploadUserProfileImg, optimizeUserProfileImg, updateUserValidator, updateUserById)
+    .delete(protect, deleteUserValidator, deleteUserById);
 
 router.route("/change-password/:id")
     .put(updateUserPasswordValidator, updateUserPassword);

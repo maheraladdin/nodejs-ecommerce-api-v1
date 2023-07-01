@@ -118,18 +118,26 @@ const setSlug = (req) => {
  * @desc    Create a document
  * @access  Private
  * @param  {Model} Model - The model to create from
+ * @param  {object?} options - The options for create
+ * @param  {boolean?} options.noResponse - The flag to not send response
+ * @return {object} - The response object or the created document
  */
-module.exports.createOne = (Model) => asyncHandler(async (req, res) => {
+module.exports.createOne = (Model,options = {}) => asyncHandler(async (req, res) => {
     // set slug
     await setSlug(req);
 
     // create document
     const document = await Model.create(req.body);
 
-    res.status(201).json({
-        status: 'success',
-        document,
-    });
+    if(!options.noResponse) {
+        res.status(201).json({
+            status: 'success',
+            document,
+        });
+    }
+    else {
+        return document;
+    }
 });
 
 /**
@@ -140,30 +148,29 @@ module.exports.createOne = (Model) => asyncHandler(async (req, res) => {
  * @param  {object?} options - The options for update
  * @param  {string[]?} options.deleteFromRequestBody - The fields to delete from request body
  * @param  {string[]?} options.selectFromRequestBody - The fields to select from request body
- * @param  {boolean?} options.changePassword - The flag to change password
+ * @param  {boolean?} options.hashPassword - The flag to hash password
  */
-module.exports.updateOne = (Model,kind = "Document",options) => asyncHandler(async (req, res, next) => {
+module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandler(async (req, res, next) => {
 
-    // check if there is options
-    if(options) {
-        // delete fields from request body if exists in options.deleteFromRequestBody
-        if(options.deleteFromRequestBody) {
-            options.deleteFromRequestBody.forEach(field => delete req.body[field]);
-        }
+    // delete fields from request body if exists in options.deleteFromRequestBody
+    if(options.deleteFromRequestBody) {
+        options.deleteFromRequestBody.forEach(field => delete req.body[field]);
+    }
 
-        // select fields from request body if exists in options.selectFromRequestBody
-        if(options.selectFromRequestBody) {
-            const fields = Object.keys(req.body);
-            options.selectFromRequestBody.forEach(field => {
-                if(!fields.includes(field)) delete req.body[field];
-            });
-        }
+    // select fields from request body if exists in options.selectFromRequestBody
+    if(options.selectFromRequestBody) {
+        const fields = Object.keys(req.body);
+        options.selectFromRequestBody.forEach(field => {
+            if(!fields.includes(field)) delete req.body[field];
+        });
+    }
 
-        if(options.changePassword) {
-            // hash password
-            const salt = bcrypt.genSaltSync(10);
-            req.body.password = bcrypt.hashSync(req.body.password, salt);
-        }
+    // Hash password if options.changePassword is true
+    if(options.hashPassword) {
+        // hash password
+        const salt = bcrypt.genSaltSync(10);
+        req.body.password = bcrypt.hashSync(req.body.password, salt);
+        req.body.passwordChangedAt = Date.now();
     }
 
     // set slug

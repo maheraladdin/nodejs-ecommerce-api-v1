@@ -23,16 +23,19 @@ const {
     optimizeImages
 } = require("../controllers/productController");
 
+// require auth controllers
+const { protect } = require("../controllers/authController");
+
 // routes
 // @route: /api/v1/products
 router.route("/")
     .get(getProducts)
-    .post(uploadImages, optimizeImages, createProductValidator, createProduct);
+    .post(protect, uploadImages, optimizeImages, createProductValidator, createProduct);
 
 // @route: /api/v1/products/:id
 router.route("/:id")
     .get(getProductByIdValidator, getProductById)
-    .put(uploadImages, optimizeImages, updateProductValidator, updateProductById)
-    .delete(deleteProductValidator, deleteProductById);
+    .put(protect, uploadImages, optimizeImages, updateProductValidator, updateProductById)
+    .delete(protect, deleteProductValidator, deleteProductById);
 
 module.exports = router;

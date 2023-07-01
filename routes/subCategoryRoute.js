@@ -20,17 +20,18 @@ const { createSubCategoryValidator,
         updateSubCategoryValidator,
         deleteSubCategoryByIdValidator } = require("../utils/ValidationLayer/Validators/SubCategoryValidators");
 
-// require middlewares
+// require auth controllers
+const { protect } = require("../controllers/authController");
 
 // routes
 router.route("/")
     .post(setParentCategoryToBody, createSubCategoryValidator, createSubCategory)
-    .get(createFilterObject, getAllSubCategories);
+    .get(protect, createFilterObject, getAllSubCategories);
 
 router.route("/:id")
     .get(getSubCategoryByIdValidator, getSubCategoryById)
-    .put(updateSubCategoryValidator, updateSubCategoryById)
-    .delete(deleteSubCategoryByIdValidator, deleteSubCategoryById);
+    .put(protect, updateSubCategoryValidator, updateSubCategoryById)
+    .delete(protect, deleteSubCategoryByIdValidator, deleteSubCategoryById);
 
 
 module.exports = router;
