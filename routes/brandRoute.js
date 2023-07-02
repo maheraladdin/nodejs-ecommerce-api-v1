@@ -11,18 +11,18 @@ const { getBrandByIdValidator, createBrandValidator, updateBrandValidator, delet
 const { getBrands, getBrandById, createBrand, updateBrandById, deleteBrandById, uploadBrandImage, optimizeBrandImage } = require("../controllers/brandController");
 
 // require auth controllers
-const { protect } = require("../controllers/authController");
+const { protect, restrictTo } = require("../controllers/authController");
 
 router.use("/:id/subCategories", require("./subCategoryRoute"));
 
 // routes
 router.route("/")
     .get(getBrands)
-    .post(protect, uploadBrandImage, optimizeBrandImage, createBrandValidator, createBrand);
+    .post(protect, restrictTo("admin","manager"), uploadBrandImage, optimizeBrandImage, createBrandValidator, createBrand);
 
 router.route("/:id")
     .get(getBrandByIdValidator, getBrandById)
-    .put(protect, uploadBrandImage, optimizeBrandImage, updateBrandValidator, updateBrandById)
-    .delete(protect, deleteBrandValidator, deleteBrandById);
+    .put(protect, restrictTo("admin","manager"), uploadBrandImage, optimizeBrandImage, updateBrandValidator, updateBrandById)
+    .delete(protect, restrictTo("admin"), deleteBrandValidator, deleteBrandById);
 
 module.exports = router;

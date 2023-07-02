@@ -65,8 +65,7 @@ module.exports.login = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    protect routes
- *
+ * @desc    this middleware used to protect routes by making sure that the user is logged in
  */
 module.exports.protect = asyncHandler(async (req, res, next) => {
     // 1) get token from request header
@@ -96,6 +95,37 @@ module.exports.protect = asyncHandler(async (req, res, next) => {
     }
 
     req.user = currentUser;
-
+    req.iat = decoded.iat;
     next();
 });
+
+/**
+ * @desc    this middleware used to restrict routes by making sure that the user has the required role
+ * @param   {String} roles
+ * @returns {Function}
+ * @type    Function
+ * @example restrictTo("admin","user")
+ */
+module.exports.restrictTo = (...roles) =>
+    asyncHandler((req, res, next) => {
+
+        /**
+         * @desc    get roleChangedAt from db
+         * @type Date
+         * @constant
+         */
+        const {roleChangedAt} = req.user;
+
+        // 1) check if user role changed after the token was created
+        if(roleChangedAt) {
+            const {iat: JWTTimestamp} = req;
+            const roleChangedTimestamp = parseInt(roleChangedAt.getTime() / 1000,10);
+            if(JWTTimestamp < roleChangedTimestamp) throw new RequestError("role changed recently. please login again..",401);
+        }
+
+        // 2) check if user role is included in roles array
+        if (!roles.includes(req.user.role)) throw new RequestError("You do not have permission to perform this action", 403);
+
+        next();
+    });
+

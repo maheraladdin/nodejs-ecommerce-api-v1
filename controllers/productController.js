@@ -90,20 +90,20 @@ module.exports.optimizeImages = async (req, res, next) => {
 /**
  * @route   POST /api/v1/products
  * @desc    Create a new product
- * @access  Private
+ * @access  Private (admin, manager)
  */
 module.exports.createProduct = createOne(Product);
 
 /**
  * @route   PUT /api/v1/categories/:id
  * @desc    Update a category by id
- * @access  Private
+ * @access  Private (admin, manager)
  */
 module.exports.updateProductById = updateOne(Product, 'Product');
 
 /**
  * @route   DELETE /api/v1/categories/:id
  * @desc    Delete a category by id
- * @access  Private
+ * @access  Private (admin)
  */
 module.exports.deleteProductById = deleteOne(Product,'Product');

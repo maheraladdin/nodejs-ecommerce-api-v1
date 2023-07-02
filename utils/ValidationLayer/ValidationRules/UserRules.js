@@ -5,7 +5,7 @@ const emailNormalize = require("../CustomValidationRules/emailNormlize");
 const phoneExists = require("../CustomValidationRules/phoneExists");
 const passwordConfirmation = require("../CustomValidationRules/passwordConfirmation");
 const checkCurrentPassword = require("../CustomValidationRules/checkCurrentPassword");
-
+const permissionsHierarchy = require("../CustomValidationRules/permissionsHierarchy");
 /**
  * @desc: Rule checks if Username is provided, and is between 3 and 50 characters long
  */
@@ -85,12 +85,13 @@ module.exports.UserPhoneRule = check("phone")
  * @desc: Rule checks optionally if User role is provided, and is valid role
  */
 module.exports.UserRoleRule = check("role")
-    .optional()
     .trim()
     .notEmpty()
     .withMessage("Please provide a valid role")
-    .isIn(["user", "admin"])
-    .withMessage("Please provide a valid role");
+    .toLowerCase()
+    .isIn(["user", "admin", "manager"])
+    .withMessage("Please provide a valid role (user, admin, manager)")
+    .custom(permissionsHierarchy);
 
 
 /**

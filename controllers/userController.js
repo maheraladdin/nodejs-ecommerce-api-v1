@@ -6,14 +6,14 @@ const User = require("../models/UserModel");
 /**
  * @route   GET /api/v1/users
  * @desc    Get all Users
- * @access  Private
+ * @access  Private (admin, manager)
  */
 module.exports.getUsers = getAll(User);
 
 /**
  * @route   GET /api/v1/users/:id
  * @desc    Get a User by id
- * @access  Private
+ * @access  Private (admin)
  */
 module.exports.getUserById = getOne(User,'User');
 
@@ -33,28 +33,42 @@ module.exports.uploadUserProfileImg = upload.single("profileImg");
 /**
  * @route   POST /api/v1/users
  * @desc    Create a new User
- * @access  Private
+ * @access  Private (admin)
  */
 module.exports.createUser = createOne(User);
 
 /**
  * @route   PUT /api/v1/users/:id
  * @desc    Update a User by id (you can't update password, active, role properties with this route)
- * @access  Private
+ * @access  Private (admin)
  */
-module.exports.updateUserById = updateOne(User, "User", {deleteFromRequestBody: ["password", "passwordConfirmation"]});
+module.exports.updateUserById = updateOne(User, "User", {deleteFromRequestBody: ["password", "passwordConfirmation", "active", "role"]});
 
 /**
  * @route   PUT /api/v1/users/change-password/:id
  * @desc    Update a User password by id
- * @type   {object}
+ * @access  Protected
  */
 module.exports.updateUserPassword = updateOne(User, "User", {selectFromRequestBody: ["password", "passwordConfirmation"], hashPassword: true});
 
 /**
+ * @route   PUT /api/v1/users/change-role/:id
+ * @desc    Update a User role by id
+ * @access  Private (admin, manager)
+ */
+module.exports.updateUserRole = updateOne(User, "User", {selectFromRequestBody: ["role"], roleChanged: true});
+
+/**
+ * @route   PUT /api/v1/users/reactive-account/:id
+ * @desc    Reactive a User account by id
+ * @access  Protected
+ */
+module.exports.reactiveAccount = updateOne(User, "User", {selectFromRequestBody: ["active"], reActive: true});
+
+/**
  * @route   DELETE /api/v1/users/:id
  * @desc    Delete a User by id
- * @access  Private
+ * @access  Private (admin)
  */
 module.exports.deleteUserById = async (req, res, next) => {
     const stateOfDeletion = req.get("stateOfDeletion");

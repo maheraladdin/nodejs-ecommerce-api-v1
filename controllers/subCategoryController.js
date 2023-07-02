@@ -39,21 +39,21 @@ module.exports.setParentCategoryToBody = async (req,res,next) => {
 /**
  * @desc    Create a new subCategory
  * @route   POST /api/v1/Categories/:id/subCategories || /api/v1/subCategories
- * @access  Private
+ * @access  Private (admin, manager)
  */
 module.exports.createSubCategory = createOne(SubCategoryModel);
 
 /**
  * @route   PUT /api/v1/subCategories/:id
  * @desc    Update a subCategory name by id
- * @access  Private
+ * @access  Private (admin, manager)
  */
 module.exports.updateSubCategoryById = updateOne(SubCategoryModel,'SubCategory');
 
 /**
  * @route   DELETE /api/v1/subCategories/:id
  * @desc    Delete a subCategory by id
- * @access  Private
+ * @access  Private (admin)
  */
 module.exports.deleteSubCategoryById = deleteOne(SubCategoryModel,'SubCategory');
 

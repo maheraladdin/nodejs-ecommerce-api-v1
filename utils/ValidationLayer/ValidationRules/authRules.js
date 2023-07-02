@@ -100,7 +100,7 @@ module.exports.UserRoleRule = check("role")
     .trim()
     .notEmpty()
     .withMessage("Please provide a valid role")
-    .isIn(["user", "admin"])
+    .isIn(["user", "admin", "manager"])
     .withMessage("Please provide a valid role");
 
 

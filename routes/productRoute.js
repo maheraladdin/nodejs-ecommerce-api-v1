@@ -24,18 +24,18 @@ const {
 } = require("../controllers/productController");
 
 // require auth controllers
-const { protect } = require("../controllers/authController");
+const { protect, restrictTo } = require("../controllers/authController");
 
 // routes
 // @route: /api/v1/products
 router.route("/")
     .get(getProducts)
-    .post(protect, uploadImages, optimizeImages, createProductValidator, createProduct);
+    .post(protect, restrictTo("admin","manager"), uploadImages, optimizeImages, createProductValidator, createProduct);
 
 // @route: /api/v1/products/:id
 router.route("/:id")
     .get(getProductByIdValidator, getProductById)
-    .put(protect, uploadImages, optimizeImages, updateProductValidator, updateProductById)
-    .delete(protect, deleteProductValidator, deleteProductById);
+    .put(protect, restrictTo("admin","manager"), uploadImages, optimizeImages, updateProductValidator, updateProductById)
+    .delete(protect, restrictTo("admin"), deleteProductValidator, deleteProductById);
 
 module.exports = router;

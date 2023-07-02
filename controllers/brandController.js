@@ -33,20 +33,20 @@ module.exports.uploadBrandImage = upload.single("image");
 /**
  * @route   POST /api/v1/brands
  * @desc    Create a new brand
- * @access  Private
+ * @access  Private (admin, manager)
 */
 module.exports.createBrand = createOne(Brand);
 
 /**
  * @route   PUT /api/v1/brands/:id
  * @desc    Update a brand by id
- * @access  Private
+ * @access  Private (admin, manager)
 */
 module.exports.updateBrandById = updateOne(Brand, "Brand");
 
 /**
  * @route   DELETE /api/v1/brands/:id
  * @desc    Delete a brand by id
- * @access  Private
+ * @access  Private (admin)
 */
 module.exports.deleteBrandById = deleteOne(Brand, "Brand");

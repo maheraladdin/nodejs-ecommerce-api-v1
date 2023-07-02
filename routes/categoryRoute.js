@@ -17,18 +17,18 @@ const {
     uploadCategoryImage,
     optimizeCategoryImage} = require("../controllers/categoryController");
 
-const { protect } = require("../controllers/authController");
+const { protect, restrictTo } = require("../controllers/authController");
 
 router.use("/:id/subCategories", require("./subCategoryRoute"));
 
 // routes
 router.route("/")
     .get(getCategories)
-    .post(protect, uploadCategoryImage, optimizeCategoryImage, createCategoryValidator, createCategory);
+    .post(protect, restrictTo("admin","manager"), uploadCategoryImage, optimizeCategoryImage, createCategoryValidator, createCategory);
 
 router.route("/:id")
     .get(getCategoryByIdValidator, getCategoryById)
-    .put(protect, uploadCategoryImage, optimizeCategoryImage, updateCategoryValidator, updateCategoryById)
-    .delete(protect, deleteCategoryValidator, deleteCategoryById);
+    .put(protect, restrictTo("admin","manager"), uploadCategoryImage, optimizeCategoryImage, updateCategoryValidator, updateCategoryById)
+    .delete(protect, restrictTo("admin"), deleteCategoryValidator, deleteCategoryById);
 
 module.exports = router;

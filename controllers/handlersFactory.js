@@ -149,6 +149,8 @@ module.exports.createOne = (Model,options = {}) => asyncHandler(async (req, res)
  * @param  {string[]?} options.deleteFromRequestBody - The fields to delete from request body
  * @param  {string[]?} options.selectFromRequestBody - The fields to select from request body
  * @param  {boolean?} options.hashPassword - The flag to hash password
+ * @param  {boolean?} options.reActive - The flag to re-active document
+ * @param   {boolean?} options.roleChanged - The flag to change role
  */
 module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandler(async (req, res, next) => {
 
@@ -171,6 +173,16 @@ module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandle
         const salt = bcrypt.genSaltSync(10);
         req.body.password = bcrypt.hashSync(req.body.password, salt);
         req.body.passwordChangedAt = Date.now();
+    }
+
+    // re-active document if options.reActive is true
+    if(options.reActive) {
+        req.body.active = true;
+    }
+
+    // role updated at if role changed
+    if(options.roleChanged) {
+        req.body.roleChangedAt = Date.now();
     }
 
     // set slug

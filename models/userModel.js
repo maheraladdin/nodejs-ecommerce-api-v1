@@ -25,10 +25,7 @@ const userSchema = new mongoose.Schema({
         unique: true,
         trim: true,
     },
-    phone: {
-        type: String,
-        unique: true,
-    },
+    phone: String,
     profileImg: {
         type: String,
         default: defaultProfileImg
@@ -42,9 +39,10 @@ const userSchema = new mongoose.Schema({
     passwordChangedAt: Date,
     role: {
         type: String,
-        enum: ['user', 'admin'],
+        enum: ['user', 'admin', 'manager'],
         default: 'user',
     },
+    roleChangedAt: Date,
     active: {
         type: Boolean,
         default: true,

@@ -34,21 +34,21 @@ module.exports.uploadCategoryImage = upload.single("image");
 /**
  * @route   POST /api/v1/categories
  * @desc    Create a new category
- * @access  Private
+ * @access  Private (admin, manager)
  * @type    {object}
 */
 module.exports.createCategory = createOne(Category);
 /**
  * @route   PUT /api/v1/categories/:id
  * @desc    Update a category by id
- * @access  Private
+ * @access  Private (admin, manager)
  * @type    {object}
 */
 module.exports.updateCategoryById = updateOne(Category, "category");
 /**
  * @route   DELETE /api/v1/categories/:id
  * @desc    Delete a category by id
- * @access  Private
+ * @access  Private (admin)
  * @type    {object}
 */
 module.exports.deleteCategoryById = deleteOne(Category, "category");
