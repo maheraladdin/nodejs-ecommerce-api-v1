@@ -133,8 +133,18 @@ module.exports.restrictTo = (...roles) =>
     });
 
 /**
+ * @desc    this middleware used to hash reset token
+ * @param resetToken
+ * @return {string}
+ */
+const hash = (resetToken) => crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+/**
  * @desc    this middleware used to ask for change password
- * @route   Post /api/v1/auth/forget-password
+ * @route   Post /api/v1/auth/forgetPassword
  * @access  Public
  */
 module.exports.forgetPassword = asyncHandler(async (req, res) => {
@@ -163,10 +173,7 @@ module.exports.forgetPassword = asyncHandler(async (req, res) => {
     }
 
     // 5) add hashed reset token
-    user.passwordResetToken = crypto
-        .createHash("sha256")
-        .update(resetToken)
-        .digest("hex");
+    user.passwordResetToken = hash(resetToken);
 
     // 6) add Expire date for password reset token (10 min)
     user.passwordResetTokenExpire = Date.now() + (10 * 60 * 1000);
@@ -181,5 +188,72 @@ module.exports.forgetPassword = asyncHandler(async (req, res) => {
     res.status(200).json({
        status: "Success",
        massage: "Reset code sent to your email",
+    });
+});
+
+/**
+ * @desc    this middleware used to verify password reset token
+ * @route   Post /api/v1/auth/verifyPasswordResetToken
+ * @access  Public
+ */
+module.exports.verifyPasswordResetToken = asyncHandler(async (req, res) => {
+    // 1) Get passwordResetToken from request body
+    const {passwordResetToken} = req.body;
+
+    // 2) Hash the reset token
+    const hashedToken = hash(passwordResetToken);
+
+    // 3) Get user based on the hashed token and check if token has not expired
+    const user = await User.findOne({passwordResetToken: hashedToken, passwordResetTokenExpire: {$gt: Date.now()}});
+
+    // 4) If there is no user, throw error (token is invalid or has expired)
+    if(!user) throw new RequestError("Token is invalid or has expired", 400);
+    if(user.passwordResetTokenVerification) throw new RequestError("Token already verified", 400);
+
+    // 5) If there is user, set user passwordResetTokenVerification to true
+    user.passwordResetTokenVerification = true;
+
+    // 6) Save to db
+    await user.save();
+
+    // send response in case of success
+    res.status(200).json({
+        status: "Success",
+        massage: "Token verified successfully",
+    });
+});
+
+/**
+ * @desc    this middleware used to reset password
+ * @route   Post /api/v1/auth/resetPassword
+ * @access  Public
+ */
+module.exports.resetPassword = asyncHandler(async (req, res) => {
+    // get user based on the email and check if token has verified
+    const {email} = req.body;
+    const user = await User.findOne({email, passwordResetTokenVerification: true}).select("+password");
+
+    // if there is no user, throw error (token is unverified)
+    if(!user) throw new RequestError("Token is unverified", 400);
+
+    // check if current password is same as the new password
+    if(bcrypt.compareSync(req.body.password, user.password))
+        throw new RequestError("Current password is same as the new password", 400);
+
+    // if there is user, hash password
+    const salt = bcrypt.genSaltSync(10);
+    const password = bcrypt.hashSync(req.body.password, salt);
+
+    // unset passwordResetToken, passwordResetTokenExpire, passwordResetTokenVerification
+    await user.updateOne({password,$unset: {passwordResetToken: 1, passwordResetTokenExpire: 1, passwordResetTokenVerification: 1}});
+
+    // log user in, send JWT
+    const token = generateToken({id: user._id});
+
+    // send response in case of success
+    res.status(200).json({
+        status: "Success",
+        massage: "Password reset successfully",
+        token,
     });
 });

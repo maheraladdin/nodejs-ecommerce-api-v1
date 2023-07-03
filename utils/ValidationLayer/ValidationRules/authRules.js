@@ -108,3 +108,13 @@ module.exports.UserRoleRule = check("role")
  * @desc: Rule checks if User id is valid mongo id
  */
 module.exports.UserIdRule = idRule("User");
+
+/**
+ * @desc: Rule checks if User reset password token is provided, and is valid mongo id
+ */
+module.exports.UserResetPasswordTokenRule = check("passwordResetToken")
+    .trim()
+    .notEmpty()
+    .withMessage("password reset token is required")
+    .matches(/^[0-9]{6}$/)
+    .withMessage("Please provide a valid password reset token");

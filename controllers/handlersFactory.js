@@ -153,6 +153,12 @@ module.exports.createOne = (Model,options = {}) => asyncHandler(async (req, res)
  */
 module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandler(async (req, res, next) => {
 
+    // get id from params
+    const { id } = req.params;
+
+    // get document by id
+    const document = await Model.findById(id);
+
     // delete fields from request body if exists in options.deleteFromRequestBody
     if(options.deleteFromRequestBody) {
         options.deleteFromRequestBody.forEach(field => delete req.body[field]);
@@ -176,6 +182,7 @@ module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandle
 
     // re-active document if options.reActive is true
     if(options.reActive) {
+        if(document.active) throw new RequestError(`${kind} is already active`, 400);
         req.body.active = true;
     }
 
@@ -187,11 +194,7 @@ module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandle
     // set slug
     await setSlug(req);
 
-    // get id from params
-    const { id } = req.params;
-
-    // update document
-    const document = await Model.findByIdAndUpdate(id, req.body, { new: true });
+    document.updateOne(req.body, { new: true });
 
     // check if document exists
     if (!document)

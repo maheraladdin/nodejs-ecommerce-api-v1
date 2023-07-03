@@ -24,13 +24,13 @@ router.route("/:id")
     .delete(protect, restrictTo('admin'), deleteUserValidator, deleteUserById);
 
 router.route("/change-password/:id")
-    .put(protect, updateUserPasswordValidator, updateUserPassword);
+    .patch(protect, updateUserPasswordValidator, updateUserPassword);
 
 router.route("/change-role/:id")
-    .put(protect, restrictTo('admin','manager'), updateUserRoleValidator, updateUserRole);
+    .patch(protect, restrictTo('admin','manager'), updateUserRoleValidator, updateUserRole);
 
 router.route("/reactive-account/:id")
-    .put(protect, reactiveAccount);
+    .patch(protect, reactiveAccount);
 
 
 module.exports = router;
