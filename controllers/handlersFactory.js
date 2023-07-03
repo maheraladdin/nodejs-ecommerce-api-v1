@@ -188,6 +188,7 @@ module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandle
 
     // role updated at if role changed
     if(options.roleChanged) {
+        if(req.body.role === document.role) throw new RequestError(`${kind} role is already ${req.body.role}`, 400);
         req.body.roleChangedAt = Date.now();
     }
 
