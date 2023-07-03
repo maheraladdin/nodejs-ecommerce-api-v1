@@ -3,6 +3,7 @@ const {deleteOne, getAll, getOne, updateOne, createOne, optimizeImage,generateTo
 const upload = require("../middlewares/uploadImageMW");
 const User = require("../models/UserModel");
 const asyncHandler = require("express-async-handler");
+const bcrypt = require("bcrypt");
 /**
  * @route   GET /api/v1/users
  * @desc    Get all Users
@@ -67,8 +68,9 @@ module.exports.updateUserPassword = updateOne(User, "User", {selectFromRequestBo
  * @access  Protected
  */
 module.exports.updateLoggedUserPassword = asyncHandler(async (req, res) => {
+
     // update password
-    updateOne(User, "User", {selectFromRequestBody: ["password", "passwordConfirmation"], hashPassword: true, noResponse: true});
+    await User.findByIdAndUpdate(req.user.id, {password: bcrypt.hashSync(req.body.password,10), passwordChangedAt: Date.now()});
 
     // generate token
     const token = generateToken({id: req.user.id});

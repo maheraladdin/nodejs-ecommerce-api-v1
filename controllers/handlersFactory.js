@@ -9,6 +9,15 @@ const bcrypt = require("bcrypt");
 // require custom modules
 const RequestError = require("../utils/RequestError");
 const ApiFeatures = require("../utils/ApiFeatures");
+const jwt = require("jsonwebtoken");
+
+/**
+ * @desc    generate token
+ * @param   {Object} payload
+ */
+module.exports.generateToken = (payload) => {
+    return jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRES_IN});
+}
 
 /**
  * @desc    optimize category image
@@ -156,9 +165,6 @@ module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandle
     // get id from params
     const { id } = req.params;
 
-    // get document by id
-    const document = await Model.findById(id);
-
     // delete fields from request body if exists in options.deleteFromRequestBody
     if(options.deleteFromRequestBody) {
         options.deleteFromRequestBody.forEach(field => delete req.body[field]);
@@ -182,20 +188,35 @@ module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandle
 
     // re-active document if options.reActive is true
     if(options.reActive) {
-        if(document.active) throw new RequestError(`${kind} is already active`, 400);
-        req.body.active = true;
+        const activeState = await Model.findById(id).select("active");
+        if(activeState.active) throw new RequestError(`${kind} is already active`, 400);
+        activeState.active = true;
+        activeState.activeAt = Date.now();
+        await activeState.save();
+        return res.status(200).json({
+           status: 'success',
+          message: `${kind} is re-activated`
+        });
     }
 
     // role updated at if role changed
     if(options.roleChanged) {
-        if(req.body.role === document.role) throw new RequestError(`${kind} role is already ${req.body.role}`, 400);
-        req.body.roleChangedAt = Date.now();
+        const roleState = await Model.findById(id).select("role");
+        if(req.body.role === roleState.role) throw new RequestError(`${kind} role is already ${req.body.role}`, 400);
+        roleState.role = req.body.role;
+        roleState.roleChangedAt = Date.now();
+        await roleState.save();
+        return res.status(200).json({
+            status: 'success',
+            message: `${kind} role is changed to ${req.body.role}`
+        });
     }
 
     // set slug
     await setSlug(req);
 
-    document.updateOne(req.body, { new: true });
+    // update document
+    const document = await Model.findByIdAndUpdate(id, req.body, { new: true });
 
     // check if document exists
     if (!document)
