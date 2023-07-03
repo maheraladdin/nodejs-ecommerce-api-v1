@@ -8,29 +8,36 @@ const router = express.Router();
 const { getUserByIdValidator, createUserValidator, updateUserValidator, updateUserPasswordValidator, deleteUserValidator, updateUserRoleValidator } = require("../utils/ValidationLayer/Validators/UserValidators");
 
 // require controllers
-const { getUsers, getUserById, createUser, updateUserById, deleteUserById, uploadUserProfileImg, optimizeUserProfileImg, updateUserPassword, updateUserRole, reactiveAccount } = require("../controllers/UserController");
+const { getUsers, getUserById, createUser, updateUserById, deleteUserById, uploadUserProfileImg, optimizeUserProfileImg, updateUserPassword, updateUserRole, reactiveAccount, getLoggedUser, updateLoggedUserPassword } = require("../controllers/UserController");
 
 // require auth controllers
 const { protect, restrictTo } = require("../controllers/authController");
 
-// routes
+// protected routes
+router.use(protect);
+router.get("/loggedUser", getLoggedUser, getUserById);
+router.patch("/changePassword", getLoggedUser, updateUserPasswordValidator, updateLoggedUserPassword);
+
+// Private routes for admin and manager
+router.use(restrictTo('admin','manager'));
+
 router.route("/")
-    .get(protect, restrictTo('admin','manager'), getUsers)
-    .post(protect, restrictTo('admin'), uploadUserProfileImg, optimizeUserProfileImg, createUserValidator, createUser);
+    .get(getUsers)
+    .post(uploadUserProfileImg, optimizeUserProfileImg, createUserValidator, createUser);
 
 router.route("/:id")
-    .get(protect, restrictTo('admin'), getUserByIdValidator, getUserById)
-    .put(protect, restrictTo('admin'), uploadUserProfileImg, optimizeUserProfileImg, updateUserValidator, updateUserById)
-    .delete(protect, restrictTo('admin'), deleteUserValidator, deleteUserById);
+    .get(getUserByIdValidator, getUserById)
+    .put(uploadUserProfileImg, optimizeUserProfileImg, updateUserValidator, updateUserById)
+    .delete(deleteUserValidator, deleteUserById);
 
 router.route("/change-password/:id")
-    .patch(protect, updateUserPasswordValidator, updateUserPassword);
+    .patch(updateUserPasswordValidator, updateUserPassword);
 
 router.route("/change-role/:id")
-    .patch(protect, restrictTo('admin','manager'), updateUserRoleValidator, updateUserRole);
+    .patch(updateUserRoleValidator, updateUserRole);
 
 router.route("/reactive-account/:id")
-    .patch(protect, reactiveAccount);
+    .patch(reactiveAccount);
 
 
 module.exports = router;

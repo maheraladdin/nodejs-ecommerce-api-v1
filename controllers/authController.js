@@ -11,16 +11,10 @@ const bcrypt = require("bcrypt");
 const asyncHandler = require("express-async-handler");
 const RequestError = require("../utils/RequestError");
 const User = require("../models/UserModel");
-const {createOne} = require("./handlersFactory");
+const {createOne,generateToken} = require("./handlersFactory");
 const sendEmail = require("../utils/sendEmail");
 
-/**
- * @desc    generate token
- * @param   {Object} payload
- */
-const generateToken = (payload) => {
-    return jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRES_IN});
-}
+
 
 /**
  * @desc    sign up user
