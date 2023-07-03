@@ -129,15 +129,14 @@ module.exports.createOne = (Model,options = {}) => asyncHandler(async (req, res)
     // create document
     const document = await Model.create(req.body);
 
-    if(!options.noResponse) {
-        res.status(201).json({
-            status: 'success',
-            document,
-        });
-    }
-    else {
-        return document;
-    }
+    // check if options.noResponse is true then return document
+    if(options.noResponse) return document;
+
+    // send response
+    res.status(201).json({
+        status: 'success',
+        document,
+    });
 });
 
 /**

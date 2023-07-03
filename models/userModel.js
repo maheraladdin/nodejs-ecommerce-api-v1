@@ -17,7 +17,6 @@ const userSchema = new mongoose.Schema({
     slug: {
         type: String,
         lowercase: true,
-
     },
     email: {
         type: String,
@@ -37,6 +36,9 @@ const userSchema = new mongoose.Schema({
         select: false
     },
     passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetTokenExpire: Date,
+    passwordResetTokenVerification: Boolean,
     role: {
         type: String,
         enum: ['user', 'admin', 'manager'],

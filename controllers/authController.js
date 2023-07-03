@@ -1,14 +1,18 @@
 // Desc: auth controller
 
+// require core modules
+const crypto = require("crypto");
+
 // require third-party modules
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
-// require local modules
+// require custom modules
 const asyncHandler = require("express-async-handler");
 const RequestError = require("../utils/RequestError");
 const User = require("../models/UserModel");
 const {createOne} = require("./handlersFactory");
+const sendEmail = require("../utils/sendEmail");
 
 /**
  * @desc    generate token
@@ -104,7 +108,6 @@ module.exports.protect = asyncHandler(async (req, res, next) => {
  * @param   {String} roles
  * @returns {Function}
  * @type    Function
- * @example restrictTo("admin","user")
  */
 module.exports.restrictTo = (...roles) =>
     asyncHandler((req, res, next) => {
@@ -117,10 +120,10 @@ module.exports.restrictTo = (...roles) =>
         const {roleChangedAt} = req.user;
 
         // 1) check if user role changed after the token was created
-        if(roleChangedAt) {
+        if (roleChangedAt) {
             const {iat: JWTTimestamp} = req;
-            const roleChangedTimestamp = parseInt(roleChangedAt.getTime() / 1000,10);
-            if(JWTTimestamp < roleChangedTimestamp) throw new RequestError("role changed recently. please login again..",401);
+            const roleChangedTimestamp = parseInt(roleChangedAt.getTime() / 1000, 10);
+            if (JWTTimestamp < roleChangedTimestamp) throw new RequestError("role changed recently. please login again..", 401);
         }
 
         // 2) check if user role is included in roles array
@@ -129,3 +132,54 @@ module.exports.restrictTo = (...roles) =>
         next();
     });
 
+/**
+ * @desc    this middleware used to ask for change password
+ * @route   Post /api/v1/auth/forget-password
+ * @access  Public
+ */
+module.exports.forgetPassword = asyncHandler(async (req, res) => {
+    // 1) get user based on posted email
+    const {email} = req.body;
+
+    // 2) check if user exists
+    const user = await User.findOne({email});
+    if(!user) throw new RequestError("There is no user with email address.",404);
+
+    // 3) generate random reset token
+    const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // 4) send it to user's email
+    const message =
+        `Hi ${user.name}, \n\nWe received a request to reset the password on your E-shop Account. \n\n${resetToken} \n\nEnter this code to complete the reset. \n\nThanks to help us make your account secure. \n\nThe E-shop Team`;
+    try {
+        await sendEmail({
+            FromEmail: `E-shop App <${process.env.EMAIL_USER}>`,
+            toEmail: email,
+            subject: `Password reset code (valid for 10 minutes)`,
+            message,
+        });
+    } catch (err) {
+        throw new RequestError("There was an error sending the email. Try again later!", 500);
+    }
+
+    // 5) add hashed reset token
+    user.passwordResetToken = crypto
+        .createHash("sha256")
+        .update(resetToken)
+        .digest("hex");
+
+    // 6) add Expire date for password reset token (10 min)
+    user.passwordResetTokenExpire = Date.now() + (10 * 60 * 1000);
+
+    // 7) add password reset token verified
+    user.passwordResetTokenVerification = false;
+
+    // 8) save to db
+    await user.save();
+
+    // send response in case of success
+    res.status(200).json({
+       status: "Success",
+       massage: "Reset code sent to your email",
+    });
+});
