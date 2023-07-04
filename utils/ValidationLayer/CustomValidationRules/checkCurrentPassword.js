@@ -8,12 +8,14 @@ const bcrypt = require("bcrypt");
  * @param {object} req - Request object
  * @param {object} req.params - Request params object
  * @param {string} req.params.id - User id
+ * @param {object} req.user - Logged user object
+ * @param {string} req.user.id - Logged user id
  * @param {object} req.body - Request body object
  * @param {string} req.body.password - New password
  * @return {Promise<boolean>}
  */
 module.exports = async (currentPassword,{req}) => {
-    const {id} = req.params;
+    const id = req.params.id || req.user.id;
     // get user password from db
     const userPasswordInDb = await User.findById(id).select("+password");
     // check if current password is correct

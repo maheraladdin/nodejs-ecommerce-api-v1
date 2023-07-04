@@ -19,7 +19,7 @@ module.exports.updateUserValidator = expressValidatorCallback([UserIdRule, UserN
 // @desc: Validator for updating user password
 // @usage: use this validator in routes to validate user password
 // @note: this validator should be placed before the controller
-module.exports.updateUserPasswordValidator = expressValidatorCallback([UserIdRule, UserCurrentPasswordRule, UserPasswordConfirmationRule, UserPasswordRule]);
+module.exports.updateUserPasswordValidator = expressValidatorCallback([UserCurrentPasswordRule, UserPasswordConfirmationRule, UserPasswordRule]);
 
 // @desc: Validator for updating user role
 // @usage: use this validator in routes to validate user role

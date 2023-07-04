@@ -16,29 +16,14 @@ const sendEmail = require("../utils/sendEmail");
 
 
 
-/**
+/*
  * @desc    sign up user
  * @route   POST /api/v1/auth/signup
  * @access  public
  */
-module.exports.signup = asyncHandler(async (req, res) => {
-    // create new user
-    const user = await createOne(User,{noResponse: true})(req, res);
+module.exports.signup = createOne(User,{generateToken: true});
 
-    // generate token
-    const token = generateToken({id: user._id});
-
-    // send token
-    res.status(201).json({
-        status: "success",
-        token,
-        data: {
-            user
-        }
-    });
-});
-
-/**
+/*
  * @desc    login user
  * @route   POST /api/v1/auth/login
  * @access  public
@@ -62,8 +47,8 @@ module.exports.login = asyncHandler(async (req, res) => {
     });
 });
 
-/**
- * @desc    this middleware used to protect routes by making sure that the user is logged in
+/*
+ * @desc    this middleware used to protect routes by making sure that the user is logged in before accessing the route
  */
 module.exports.protect = asyncHandler(async (req, res, next) => {
     // 1) get token from request header
@@ -128,20 +113,24 @@ module.exports.restrictTo = (...roles) =>
 
 /**
  * @desc    this middleware used to hash reset token
- * @param resetToken
- * @return {string}
+ * @param   {string} resetToken - reset token
+ * @return  {string}
  */
 const hash = (resetToken) => crypto
     .createHash("sha256")
     .update(resetToken)
     .digest("hex");
 
+
 /**
- * @desc    this middleware used to ask for change password
- * @route   Post /api/v1/auth/forgetPassword
- * @access  Public
+ * @desc    this middleware used to ask for change password (send reset token to user's email)
+ * @param   {object} req - request object
+ * @param   {object} req.body - request body
+ * @param   {string} req.body.email - user's email
+ * @param   {object} res - response object
+ * @return  {Promise<void>}
  */
-module.exports.forgetPassword = asyncHandler(async (req, res) => {
+const forgetPasswordHandler = async (req, res) => {
     // 1) get user based on posted email
     const {email} = req.body;
 
@@ -180,17 +169,27 @@ module.exports.forgetPassword = asyncHandler(async (req, res) => {
 
     // send response in case of success
     res.status(200).json({
-       status: "Success",
-       massage: "Reset code sent to your email",
+        status: "Success",
+        massage: "Reset code sent to your email",
     });
-});
+}
 
-/**
- * @desc    this middleware used to verify password reset token
- * @route   Post /api/v1/auth/verifyPasswordResetToken
+/*
+ * @desc    this middleware used to ask for change password
+ * @route   Post /api/v1/auth/forgetPassword
  * @access  Public
  */
-module.exports.verifyPasswordResetToken = asyncHandler(async (req, res) => {
+module.exports.forgetPassword = asyncHandler(forgetPasswordHandler);
+
+/**
+ * @desc    this middleware used to verify reset token
+ * @param   {object} req - request object
+ * @param   {object} req.body - request body
+ * @param   {string} req.body.passwordResetToken - reset token
+ * @param   {object} res - response object
+ * @return  {Promise<void>}
+ */
+const verifyPasswordResetTokenHandler = async (req, res) => {
     // 1) Get passwordResetToken from request body
     const {passwordResetToken} = req.body;
 
@@ -215,14 +214,26 @@ module.exports.verifyPasswordResetToken = asyncHandler(async (req, res) => {
         status: "Success",
         massage: "Token verified successfully",
     });
-});
+}
+
+/*
+ * @desc    this middleware used to verify password reset token
+ * @route   Post /api/v1/auth/verifyPasswordResetToken
+ * @access  Public
+ */
+module.exports.verifyPasswordResetToken = asyncHandler(verifyPasswordResetTokenHandler);
+
 
 /**
  * @desc    this middleware used to reset password
- * @route   Post /api/v1/auth/resetPassword
- * @access  Public
+ * @param   {object} req - request object
+ * @param   {object} req.body - request body
+ * @param   {string} req.body.email - user's email
+ * @param   {string} req.body.password - user's password
+ * @param   {object} res - response object
+ * @return {Promise<void>}
  */
-module.exports.resetPassword = asyncHandler(async (req, res) => {
+const resetPasswordHandler = async (req, res) => {
     // get user based on the email and check if token has verified
     const {email} = req.body;
     const user = await User.findOne({email, passwordResetTokenVerification: true}).select("+password");
@@ -230,15 +241,11 @@ module.exports.resetPassword = asyncHandler(async (req, res) => {
     // if there is no user, throw error (token is unverified)
     if(!user) throw new RequestError("Token is unverified", 400);
 
-    // check if current password is same as the new password
-    if(bcrypt.compareSync(req.body.password, user.password))
-        throw new RequestError("Current password is same as the new password", 400);
-
     // if there is user, hash password
     const salt = bcrypt.genSaltSync(10);
     const password = bcrypt.hashSync(req.body.password, salt);
 
-    // unset passwordResetToken, passwordResetTokenExpire, passwordResetTokenVerification
+    // update password and unset passwordResetToken, passwordResetTokenExpire, passwordResetTokenVerification
     await user.updateOne({password,$unset: {passwordResetToken: 1, passwordResetTokenExpire: 1, passwordResetTokenVerification: 1}});
 
     // log user in, send JWT
@@ -250,4 +257,11 @@ module.exports.resetPassword = asyncHandler(async (req, res) => {
         massage: "Password reset successfully",
         token,
     });
-});
+}
+
+/*
+ * @desc    this middleware used to reset password
+ * @route   Post /api/v1/auth/resetPassword
+ * @access  Public
+ */
+module.exports.resetPassword = asyncHandler(resetPasswordHandler);

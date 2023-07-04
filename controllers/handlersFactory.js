@@ -98,7 +98,7 @@ module.exports.getAll = (Model,kind = "Document") => asyncHandler(async (req, re
  */
 module.exports.getOne = (Model,kind = "Document") => asyncHandler(async (req, res, next) => {
     // get id from params
-    const { id } = req.params;
+    const id = req.params.id || req.user.id;
 
     // execute query
     const document = await Model.findById(id);
@@ -116,6 +116,9 @@ module.exports.getOne = (Model,kind = "Document") => asyncHandler(async (req, re
 /**
  * @desc    set slug for document
  * @param   {object} req - The request object
+ * @param   {object} req.body - The request body
+ * @param   {string} req.body.name - The name of document
+ * @param   {string} req.body.title - The title of document
  */
 const setSlug = (req) => {
     const {name, title} = req.body;
@@ -128,25 +131,29 @@ const setSlug = (req) => {
  * @access  Private
  * @param  {Model} Model - The model to create from
  * @param  {object?} options - The options for create
- * @param  {boolean?} options.noResponse - The flag to not send response
+ * @param  {string?} options.message - The message to send in response
+ * @param  {boolean?} options.generateToken - The flag to generate token
  * @return {object} - The response object or the created document
  */
 module.exports.createOne = (Model,options = {}) => asyncHandler(async (req, res) => {
     // set slug
     await setSlug(req);
 
-    // create document
-    const document = await Model.create(req.body);
+    // response object
+    const responseObject = {
+        status: 'success',
+        message: options.message || "Document created successfully",
+    }
 
-    // check if options.noResponse is true then return document
-    if(options.noResponse) return document;
+    // create document
+    responseObject.document = await Model.create(req.body);
+
+    responseObject.token = options.generateToken && module.exports.generateToken({id: responseObject.document._id});
 
     // send response
-    res.status(201).json({
-        status: 'success',
-        document,
-    });
+    res.status(201).json(responseObject);
 });
+
 
 /**
  * @desc    Update a document by id
@@ -159,11 +166,29 @@ module.exports.createOne = (Model,options = {}) => asyncHandler(async (req, res)
  * @param  {boolean?} options.hashPassword - The flag to hash password
  * @param  {boolean?} options.reActive - The flag to re-active document
  * @param   {boolean?} options.roleChanged - The flag to change role
+ * @param   {boolean?} options.generateToken - The flag to generate token
+ * @param   {boolean?} options.message - The message to send in response
  */
-module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandler(async (req, res, next) => {
+module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandler(
+    /**
+     * @desc    Update a document by id Handler
+     * @param   {object} req - The request object
+     * @param   {object} req.body - The request body
+     * @param   {string} req.params.id - The id of document
+     * @param   {string} req.user.id - The id of user
+     * @param   {object} res - The response object
+     * @return  {Promise<*>}
+     */
+    async (req, res) => {
 
     // get id from params
-    const { id } = req.params;
+    const id = req.params.id || req.user.id;
+
+    // response object
+    const response = {
+        status: 'success',
+        message: options.message || `${kind} updated successfully`,
+    };
 
     // delete fields from request body if exists in options.deleteFromRequestBody
     if(options.deleteFromRequestBody) {
@@ -184,32 +209,40 @@ module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandle
         const salt = bcrypt.genSaltSync(10);
         req.body.password = bcrypt.hashSync(req.body.password, salt);
         req.body.passwordChangedAt = Date.now();
+        response.message = `${kind} password updated successfully`;
     }
 
     // re-active document if options.reActive is true
     if(options.reActive) {
+        // get active state of user from database
         const activeState = await Model.findById(id).select("active");
+        // check if user is already active
         if(activeState.active) throw new RequestError(`${kind} is already active`, 400);
+        // re-active user
         activeState.active = true;
-        activeState.activeAt = Date.now();
+        // save active state
         await activeState.save();
-        return res.status(200).json({
-           status: 'success',
-          message: `${kind} is re-activated`
-        });
+        // customize response message
+        response.message = `${kind} is re-activated`;
+        // return response
+        return res.status(200).json(response);
     }
 
     // role updated at if role changed
     if(options.roleChanged) {
+        // get role state of user from database
         const roleState = await Model.findById(id).select("role");
+        // check if role is already changed
         if(req.body.role === roleState.role) throw new RequestError(`${kind} role is already ${req.body.role}`, 400);
+        // change role
         roleState.role = req.body.role;
+        // set role changed at
         roleState.roleChangedAt = Date.now();
+        // save role state
         await roleState.save();
-        return res.status(200).json({
-            status: 'success',
-            message: `${kind} role is changed to ${req.body.role}`
-        });
+        // customize response message
+        response.message = `${kind} role is changed to ${req.body.role}`;
+        return res.status(200).json(response);
     }
 
     // set slug
@@ -220,12 +253,15 @@ module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandle
 
     // check if document exists
     if (!document)
-        return next(new RequestError(`${kind} not found for id: ${id}`, 404));
+        throw new RequestError(`${kind} not found for id: ${id}`, 404);
 
-    res.status(200).json({
-        status: 'success',
-        document
-    });
+    // generate token if options.generateToken is true and send it in response
+    response.token = options.generateToken && module.exports.generateToken({id})
+
+    // add document to response
+    response.document = document;
+    // send response
+    res.status(200).json(response);
 });
 
 /**

@@ -8,15 +8,15 @@ const router = express.Router();
 const { getUserByIdValidator, createUserValidator, updateUserValidator, updateUserPasswordValidator, deleteUserValidator, updateUserRoleValidator } = require("../utils/ValidationLayer/Validators/UserValidators");
 
 // require controllers
-const { getUsers, getUserById, createUser, updateUserById, deleteUserById, uploadUserProfileImg, optimizeUserProfileImg, updateUserPassword, updateUserRole, reactiveAccount, getLoggedUser, updateLoggedUserPassword } = require("../controllers/UserController");
+const { getUsers, getUserById, createUser, updateUserById, deleteUserById, uploadUserProfileImg, optimizeUserProfileImg, updateUserPassword, updateUserRole, reactiveAccount, updateLoggedUserPassword } = require("../controllers/UserController");
 
 // require auth controllers
 const { protect, restrictTo } = require("../controllers/authController");
 
 // protected routes
 router.use(protect);
-router.get("/loggedUser", getLoggedUser, getUserById);
-router.patch("/changePassword", getLoggedUser, updateUserPasswordValidator, updateLoggedUserPassword);
+router.get("/loggedUser", getUserById);
+router.patch("/changeLoggedUserPassword", updateUserPasswordValidator, updateLoggedUserPassword);
 
 // Private routes for admin and manager
 router.use(restrictTo('admin','manager'));
