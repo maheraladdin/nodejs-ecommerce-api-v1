@@ -16,6 +16,13 @@ module.exports.createUserValidator = expressValidatorCallback([UserNameRule, Use
 // @note: this validator should be placed before the controller
 module.exports.updateUserValidator = expressValidatorCallback([UserIdRule, UserNameOptionalRule, OptionalUserEmailRule, UserPhoneRule]);
 
+/*
+ * @desc: Validator for updating logged user data
+ * @usage: use this validator in routes to validate user data
+ * @note: this validator should be placed before the controller
+ */
+module.exports.updateLoggedUserDataValidator = expressValidatorCallback([UserNameOptionalRule, OptionalUserEmailRule, UserPhoneRule]);
+
 // @desc: Validator for updating user password
 // @usage: use this validator in routes to validate user password
 // @note: this validator should be placed before the controller

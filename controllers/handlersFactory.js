@@ -165,6 +165,7 @@ module.exports.createOne = (Model,options = {}) => asyncHandler(async (req, res)
  * @param  {string[]?} options.selectFromRequestBody - The fields to select from request body
  * @param  {boolean?} options.hashPassword - The flag to hash password
  * @param  {boolean?} options.reActive - The flag to re-active document
+ * @param  {boolean?} options.deActive - The flag to de-active document
  * @param   {boolean?} options.roleChanged - The flag to change role
  * @param   {boolean?} options.generateToken - The flag to generate token
  * @param   {boolean?} options.message - The message to send in response
@@ -189,6 +190,9 @@ module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandle
         status: 'success',
         message: options.message || `${kind} updated successfully`,
     };
+
+    // generate token if options.generateToken is true and send it in response
+    if(options.generateToken) response.token = module.exports.generateToken({id});
 
     // delete fields from request body if exists in options.deleteFromRequestBody
     if(options.deleteFromRequestBody) {
@@ -223,7 +227,23 @@ module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandle
         // save active state
         await activeState.save();
         // customize response message
-        response.message = `${kind} is re-activated`;
+        response.message = `${kind} is reactivated`;
+        // return response
+        return res.status(200).json(response);
+    }
+
+    // re-active document if options.reActive is true
+    if(options.deActive) {
+        // get active state of user from database
+        const activeState = await Model.findById(id).select("active");
+        // check if user is already active
+        if(!activeState.active) throw new RequestError(`${kind} is already deactivated`, 400);
+        // re-active user
+        activeState.active = false;
+        // save active state
+        await activeState.save();
+        // customize response message
+        response.message = `${kind} is deactivated`;
         // return response
         return res.status(200).json(response);
     }
@@ -255,9 +275,6 @@ module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandle
     if (!document)
         throw new RequestError(`${kind} not found for id: ${id}`, 404);
 
-    // generate token if options.generateToken is true and send it in response
-    response.token = options.generateToken && module.exports.generateToken({id})
-
     // add document to response
     response.document = document;
     // send response
@@ -273,7 +290,7 @@ module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandle
  */
 module.exports.deleteOne = (Model,kind = "Document") => asyncHandler(async (req, res, next) => {
     // get id from params
-    const { id } = req.params;
+    const id = req.params.id || req.user._id;
 
     // delete document
     const document = await Model.findByIdAndDelete(id);

@@ -46,7 +46,14 @@ module.exports.createUser = createOne(User);
 module.exports.updateUserById = updateOne(User, "User", {deleteFromRequestBody: ["password", "passwordConfirmation", "active", "role"]});
 
 /*
- * @route   PUT /api/v1/users/change-password/:id
+ * @route   PUT /api/v1/users/updateLoggedUserData
+ * @desc    Update logged User data (you can't update password, active, role properties with this route)
+ * @access  Protected
+ */
+module.exports.updateLoggedUserData = updateOne(User, "User", {deleteFromRequestBody: ["password", "passwordConfirmation", "active", "role"]});
+
+/*
+ * @route   PATCH /api/v1/users/change-password/:id
  * @desc    Update a User password by id
  * @access  Private (admin, manager)
  */
@@ -54,25 +61,33 @@ module.exports.updateUserPassword = updateOne(User, "User", {selectFromRequestBo
 
 
 /*
- * @route   PUT /api/v1/users/changePassword
+ * @route   PATCH /api/v1/users/changePassword
  * @desc    Update logged User password
  * @access  Protected
  */
 module.exports.updateLoggedUserPassword = updateOne(User, "User", {selectFromRequestBody: ["password", "passwordConfirmation"], hashPassword: true, generateToken: true});
 
 /*
- * @route   PUT /api/v1/users/change-role/:id
+ * @route   PATCH /api/v1/users/change-role/:id
  * @desc    Update a User role by id
  * @access  Private (admin, manager)
  */
 module.exports.updateUserRole = updateOne(User, "User", {selectFromRequestBody: ["role"], roleChanged: true});
 
 /*
- * @route   PUT /api/v1/users/reactive-account/:id
+ * @route   PATCH /api/v1/users/reactive-account/:id
  * @desc    Reactive a User account by id
  * @access  Private (admin, manager)
  */
-module.exports.reactiveAccount = updateOne(User, "User", {selectFromRequestBody: ["active"], reActive: true});
+module.exports.reactiveAccountById = updateOne(User, "User", {selectFromRequestBody: ["active"], reActive: true});
+
+/*
+ * @route   PATCH /api/v1/users/reactiveLoggedUserAccount
+ * @desc    Reactive logged User account
+ * @access  Protected
+ */
+module.exports.reactiveLoggedUserAccount = updateOne(User, "User", {selectFromRequestBody: ["active"], reActive: true, generateToken: true});
+
 
 /**
  * @desc    Delete a User by id (soft or hard)
@@ -85,8 +100,15 @@ const deleteUserByIdHandler = async (req, res, next) => {
     const stateOfDeletion = req.get("stateOfDeletion");
     if(!(stateOfDeletion === "soft")) return deleteOne(User,"User")(req,res,next);
     req.body.active = false;
-    updateOne(User,"User")(req,res,next);
+    updateOne(User,"User",{deActive: true})(req,res,next);
 }
+
+/*
+ * @route   PATCH /api/v1/users/deactivateLoggedUserAccount
+ * @desc    Deactivate logged User account
+ * @access  Protected
+ */
+module.exports.deleteLoggedUserAccount = asyncHandler(deleteUserByIdHandler);
 
 /*
  * @route   DELETE /api/v1/users/:id

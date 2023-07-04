@@ -5,10 +5,10 @@ const express = require("express");
 const router = express.Router();
 
 // require utils validators
-const { getUserByIdValidator, createUserValidator, updateUserValidator, updateUserPasswordValidator, deleteUserValidator, updateUserRoleValidator } = require("../utils/ValidationLayer/Validators/UserValidators");
+const { getUserByIdValidator, createUserValidator, updateUserValidator, updateUserPasswordValidator, deleteUserValidator, updateUserRoleValidator, updateLoggedUserDataValidator } = require("../utils/ValidationLayer/Validators/UserValidators");
 
 // require controllers
-const { getUsers, getUserById, createUser, updateUserById, deleteUserById, uploadUserProfileImg, optimizeUserProfileImg, updateUserPassword, updateUserRole, reactiveAccount, updateLoggedUserPassword } = require("../controllers/UserController");
+const { getUsers, getUserById, createUser, updateUserById, deleteUserById, uploadUserProfileImg, optimizeUserProfileImg, updateUserPassword, updateUserRole, reactiveAccountById, reactiveLoggedUserAccount, updateLoggedUserPassword, updateLoggedUserData, deleteLoggedUserAccount } = require("../controllers/UserController");
 
 // require auth controllers
 const { protect, restrictTo } = require("../controllers/authController");
@@ -17,6 +17,9 @@ const { protect, restrictTo } = require("../controllers/authController");
 router.use(protect);
 router.get("/loggedUser", getUserById);
 router.patch("/changeLoggedUserPassword", updateUserPasswordValidator, updateLoggedUserPassword);
+router.patch("/reactiveLoggedUserAccount", reactiveLoggedUserAccount);
+router.put("/updateLoggedUserData", uploadUserProfileImg, optimizeUserProfileImg, updateLoggedUserDataValidator, updateLoggedUserData);
+router.delete("/deactivateLoggedUserAccount", deleteLoggedUserAccount);
 
 // Private routes for admin and manager
 router.use(restrictTo('admin','manager'));
@@ -30,14 +33,11 @@ router.route("/:id")
     .put(uploadUserProfileImg, optimizeUserProfileImg, updateUserValidator, updateUserById)
     .delete(deleteUserValidator, deleteUserById);
 
-router.route("/change-password/:id")
-    .patch(updateUserPasswordValidator, updateUserPassword);
+router.patch("/reactive-account/:id", reactiveAccountById);
 
-router.route("/change-role/:id")
-    .patch(updateUserRoleValidator, updateUserRole);
+router.patch("/change-password/:id", updateUserPasswordValidator, updateUserPassword);
 
-router.route("/reactive-account/:id")
-    .patch(reactiveAccount);
+router.patch("/change-role/:id", updateUserRoleValidator, updateUserRole);
 
 
 module.exports = router;
