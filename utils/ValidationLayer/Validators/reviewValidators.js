@@ -1,5 +1,5 @@
 const expressValidatorCallback = require("../expressValidatorCallback");
-const {ReviewIdRule, ReviewProductIdRule, ReviewRatingRule, ReviewUserIdRule, ReviewIdRuleForDelete } = require("../ValidationRules/reviewRules");
+const {ReviewIdRule, ReviewProductIdRule, ReviewRatingRule, ReviewUserIdRule, ReviewIdRuleForDelete, ReviewUserIdRuleForUpdate } = require("../ValidationRules/reviewRules");
 
 // @desc: Validator for getting category by id from request params
 // @usage: use this validator in routes to validate category id
@@ -14,7 +14,7 @@ module.exports.createReviewValidator = expressValidatorCallback([ReviewProductId
 // @desc: Validator for updating category
 // @usage: use this validator in routes to validate category data
 // @note: this validator should be placed before the controller
-module.exports.updateReviewValidator = expressValidatorCallback([ReviewRatingRule]);
+module.exports.updateReviewValidator = expressValidatorCallback([ReviewUserIdRuleForUpdate]);
 
 // @desc: Validator for deleting category
 // @usage: use this validator in routes to validate category id

@@ -264,4 +264,4 @@ const resetPasswordHandler = async (req, res) => {
  * @route   Post /api/v1/auth/resetPassword
  * @access  Public
  */
-module.exports.resetPassword = asyncHandler(resetPasswordHandler);
+module.exports.resetPassword = asyncHandler(resetPasswordHandler); 
