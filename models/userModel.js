@@ -48,7 +48,17 @@ const userSchema = new mongoose.Schema({
     active: {
         type: Boolean,
         default: true,
-    }
+    },
+    // embedded document
+    address: [
+        {
+            postalCode: Number,
+            address: String,
+            city: String,
+            country: String,
+            flatNumber: Number,
+        }
+    ]
 }, {
     timestamps: true,
 });

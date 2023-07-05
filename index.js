@@ -12,6 +12,7 @@ const brandRoute = require('./routes/brandRoute');
 const productRoute = require('./routes/productRoute');
 const userRoute = require('./routes/userRoute');
 const authRoute = require('./routes/authRoute');
+const reviewRoute = require('./routes/reviewRoute');
 
 // require middlewares
 const errorHandler = require('./middlewares/errorHandlerMW');
@@ -51,6 +52,7 @@ app.use(`${mainPath}/brands`,brandRoute);
 app.use(`${mainPath}/products`,productRoute);
 app.use(`${mainPath}/users`,userRoute);
 app.use(`${mainPath}/auth`,authRoute);
+app.use(`${mainPath}/reviews`,reviewRoute);
 
 // Error handler middleware for handling all unhandled routes
 app.all('*',(req,res,next) => {
@@ -76,6 +78,9 @@ const server = app.listen(port, () => {
  * @desc: This function is used to handle unhandled promise rejections and uncaught exceptions
  * @param {string} msg - message to be displayed
  * @param {Error} err - error object
+ * @param {string} err.name - error name
+ * @param {string} err.message - error message
+ * @param {string} err.stack - error stack
  */
 const exitHandler = (msg, err) => {
     // close server ,then exit process
@@ -86,13 +91,13 @@ const exitHandler = (msg, err) => {
     });
 }
 
-/**
+/*
  * @desc: This event is emitted when a Promise is rejected and no error handler is attached to the promise within a turn of the event loop.
  * @event: unhandledRejection
  */
 process.on('unhandledRejection', (err) => exitHandler('UNHANDLED REJECTION! Shutting down...', err));
 
-/**
+/*
  * @desc: This event is emitted when an uncaught JavaScript exception bubbles all the way back to the event loop.
  * @event: uncaughtException
  */

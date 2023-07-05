@@ -95,8 +95,8 @@ productSchema.pre(/^find/, populateCategories);
  */
 const setInitiateBase64 = function (doc) {
     const initiateBase64 = "data:image/webp;base64,";
-    if(doc.imageCover) doc.imageCover = initiateBase64 + doc.imageCover;
-    if(doc.images) doc.images = doc.images.map(image => initiateBase64 + image);
+    if(doc.imageCover && !doc.imageCover.startsWith("http")) doc.imageCover = initiateBase64 + doc.imageCover;
+    if(doc.images) doc.images = doc.images.map(image => (!image.startsWith("http")) ? initiateBase64 + image : image);
 }
 
 productSchema.post(/(init|save)/, setInitiateBase64);
