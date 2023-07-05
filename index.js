@@ -38,6 +38,9 @@ app.use(express.json());
 // use express.urlencoded() to parse urlencoded data from request body
 app.use(express.urlencoded({ extended: true }));
 
+// use third party middlewares
+app.use(require("helmet")());
+
 // mainPath
 const mainPath = "/api/v1";
 
