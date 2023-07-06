@@ -27,6 +27,8 @@ const {
 const { protect, restrictTo } = require("../controllers/authController");
 
 // routes
+router.use("/:id/reviews", require("./reviewRoute"));
+
 // @route: /api/v1/products
 router.route("/")
     .get(getProducts)

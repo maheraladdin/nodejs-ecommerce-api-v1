@@ -23,4 +23,13 @@ const reviewSchema = new mongoose.Schema({
     }
 },{timestamps: true});
 
+// populate username and user profileImg
+reviewSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: 'user',
+        select: 'name profileImg'
+    });
+    next();
+});
+
 module.exports = mongoose.model('Review', reviewSchema);

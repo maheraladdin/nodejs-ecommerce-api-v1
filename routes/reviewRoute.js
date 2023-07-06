@@ -2,7 +2,7 @@
 // require express
 const express = require("express");
 // require router
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 // require utils validators
 const { getReviewByIdValidator, createReviewValidator, deleteReviewValidator, updateReviewValidator } = require("../utils/ValidationLayer/Validators/reviewValidators");
@@ -10,13 +10,15 @@ const { getReviewByIdValidator, createReviewValidator, deleteReviewValidator, up
 // require controllers
 const {getReviews, getReviewById, createReview, updateReviewById, deleteReviewById} = require("../controllers/reviewController");
 
+const { createFilterObject, setBodyPropertyToParamsId } = require("../controllers/handlersFactory");
+
 // require auth controllers
 const { protect, restrictTo } = require("../controllers/authController");
 
 // routes
 router.route("/")
-    .get(getReviews)
-    .post(protect, restrictTo("user"), createReviewValidator, createReview);
+    .get(createFilterObject("product"), getReviews)
+    .post(protect, restrictTo("user"), setBodyPropertyToParamsId("product"), createReviewValidator, createReview);
 
 router.route("/:id")
     .get(getReviewByIdValidator, getReviewById)

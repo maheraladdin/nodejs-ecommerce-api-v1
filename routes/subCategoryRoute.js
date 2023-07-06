@@ -7,12 +7,12 @@ const router = express.Router({ mergeParams: true });
 
 // require controllers
 const { createSubCategory,
-        setParentCategoryToBody,
         getAllSubCategories,
-        createFilterObject,
         getSubCategoryById,
         updateSubCategoryById,
         deleteSubCategoryById } = require("../controllers/subCategoryController");
+
+const { createFilterObject, setBodyPropertyToParamsId } = require("../controllers/handlersFactory");
 
 // require utils validators
 const { createSubCategoryValidator,
@@ -25,8 +25,8 @@ const { protect, restrictTo } = require("../controllers/authController");
 
 // routes
 router.route("/")
-    .post(protect, restrictTo("admin","manager"), setParentCategoryToBody, createSubCategoryValidator, createSubCategory)
-    .get(createFilterObject, getAllSubCategories);
+    .post(protect, restrictTo("admin","manager"), setBodyPropertyToParamsId("category"), createSubCategoryValidator, createSubCategory)
+    .get(createFilterObject("category"), getAllSubCategories);
 
 router.route("/:id")
     .get(getSubCategoryByIdValidator, getSubCategoryById)

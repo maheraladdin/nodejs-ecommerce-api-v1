@@ -18,23 +18,13 @@ module.exports.createFilterObject = (req, res, next) => {
  * @route   GET /api/v1/subCategories || /api/v1/Categories/:id/subCategories
  * @access  Public
  */
-module.exports.getAllSubCategories = getAll(SubCategoryModel, 'SubCategory');
+module.exports.getAllSubCategories = getAll(SubCategoryModel, 'SubCategory',{nested: true});
 /**
  * @desc    Get a subCategory by id
  * @route   GET /api/v1/subCategories/:id
  * @access  Public
  */
 module.exports.getSubCategoryById = getOne(SubCategoryModel,'SubCategory');
-/**
- * @desc    Use in nested post route to check if parentCategory doesn't exist in body then set parentCategory to id from params
- * @param   {object} req - The request object
- * @param   {object} res - The response object
- * @param   {function} next - The next middleware
- */
-module.exports.setParentCategoryToBody = async (req,res,next) => {
-    if(!req.body.category) req.body.category = req.params.id;
-    next();
-}
 
 /**
  * @desc    Create a new subCategory

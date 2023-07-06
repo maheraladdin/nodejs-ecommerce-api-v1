@@ -7,7 +7,7 @@ const Review = require("../models/reviewModel");
  * @desc    Get all reviews
  * @access  Public
  */
-module.exports.getReviews = getAll(Review);
+module.exports.getReviews = getAll(Review, 'Review',{nested: true});
 
 /*
  * @route   GET /api/v1/reviews/:id

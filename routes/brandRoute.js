@@ -13,8 +13,6 @@ const { getBrands, getBrandById, createBrand, updateBrandById, deleteBrandById, 
 // require auth controllers
 const { protect, restrictTo } = require("../controllers/authController");
 
-router.use("/:id/subCategories", require("./subCategoryRoute"));
-
 // routes
 router.route("/")
     .get(getBrands)

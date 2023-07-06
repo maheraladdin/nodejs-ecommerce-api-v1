@@ -55,17 +55,31 @@ module.exports.optimizeImage = (options = {}) => asyncHandler(async (req, res, n
 });
 
 /**
+ * @desc    create filter object for mongoose query getAll
+ * @param   {string} propertyToFilterBy - The property to filter by
+ * @return  {(function(*, *, *): void)|*}
+ */
+module.exports.createFilterObject = (propertyToFilterBy) =>
+    (req, res, next) => {
+    const { id } = req.params;
+    req.filter = id ? { [propertyToFilterBy]: id } : {};
+    next();
+}
+
+/**
  * @desc    Get all documents
  * @access  Public
  * @param  {Model} Model - The model to get from
  * @param  {string?} kind - The kind of document
+ * @param  {object?} options - The options for get
+ * @param  {boolean?} options.nested - The options nested flag
  * @return {object} - The response object
  */
-module.exports.getAll = (Model,kind = "Document") => asyncHandler(async (req, res) => {
+module.exports.getAll = (Model,kind = "Document",options = {}) => asyncHandler(async (req, res) => {
     // number of documents in collection
     const countDocuments = await Model.countDocuments();
     // Build query
-    const mongooseInitiateQuery = (kind === "SubCategory") ? Model.find(req.filter) : Model.find();
+    const mongooseInitiateQuery = options.nested ? Model.find(req.filter) : Model.find();
 
     // Create ApiFeatures instance
     const ApiFeaturesInstance = new ApiFeatures(mongooseInitiateQuery, req.query)
@@ -95,13 +109,26 @@ module.exports.getAll = (Model,kind = "Document") => asyncHandler(async (req, re
  * @access  Public
  * @param  {Model} Model - The model to get from
  * @param  {string} kind - The kind of document
+ * @param  {object?} options - The options for get
+ * @param  {string?} options.populate - The populate options
+ * @param  {string?} options.populate.path - The populate path
+ * @param  {string?} options.populate.select - The populate select
  */
-module.exports.getOne = (Model,kind = "Document") => asyncHandler(async (req, res, next) => {
+module.exports.getOne = (Model,kind = "Document",options ={}) => asyncHandler(async (req, res, next) => {
     // get id from params
     const id = req.params.id || req.user.id;
 
+    // Build query
+    const mongooseInitiateQuery = Model.findById(id);
+
+    // check populate options
+    if(options.populate) mongooseInitiateQuery.populate({
+        path: options.populate.path,
+        select: options.populate.select
+    });
+
     // execute query
-    const document = await Model.findById(id);
+    const document = await mongooseInitiateQuery;
 
     // check if document exists
     if (!document)
@@ -124,6 +151,17 @@ const setSlug = (req) => {
     const {name, title} = req.body;
     if(!name && !title) return;
     req.body.slug = slugify(name || title);
+}
+
+/**
+ * @desc    set body property to params id
+ * @param   {string} propertyToSet - The property to set
+ * @param   {string} paramsToGet - The params to get
+ * @return  {(function(*, *, *): Promise<void>)|*}
+ */
+module.exports.setBodyPropertyToParamsId = (propertyToSet,paramsToGet = "id") => async (req,res,next) => {
+    if(!req.body[propertyToSet]) req.body[propertyToSet] = req.params[paramsToGet];
+    next();
 }
 
 /**

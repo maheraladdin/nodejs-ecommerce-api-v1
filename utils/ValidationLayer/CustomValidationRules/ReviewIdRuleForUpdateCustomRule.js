@@ -16,7 +16,8 @@ module.exports = async (value, {req}) => {
     if (!review) {
         throw new RequestError('Review not found for id: ' + value, 404);
     }
-    if (review.user.toString() !== req.user._id.toString()) {
+
+    if (review.user._id.toString()  !== req.user._id.toString()) {
         throw new RequestError('only the owner of this review can update it', 403);
     }
     return true;

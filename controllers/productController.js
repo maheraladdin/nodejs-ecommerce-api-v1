@@ -17,7 +17,7 @@ module.exports.getProducts = getAll(Product);
  * @desc    Get a product by id
  * @access  Public
  */
-module.exports.getProductById = getOne(Product, 'Product');
+module.exports.getProductById = getOne(Product, 'Product', { populate: { path: "reviews", select: "review rating user" } });
 
 /**
  * @route   POST /api/v1/products/uploadImageCover

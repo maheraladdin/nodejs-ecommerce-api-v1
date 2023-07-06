@@ -70,7 +70,19 @@ const productSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     }
-}, {timestamps: true});
+}, {
+    timestamps: true ,
+    // to enable virtual populate
+    toJSON: {virtuals: true},
+    toObject: {virtuals: true}
+});
+
+// create virtual property
+productSchema.virtual("reviews", {
+    ref: "Review",
+    foreignField: "product",
+    localField: "_id",
+});
 
 /**
  * @desc    mongoose pre middleware to populate category
