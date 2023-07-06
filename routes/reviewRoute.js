@@ -18,7 +18,7 @@ const { protect, restrictTo } = require("../controllers/authController");
 // routes
 router.route("/")
     .get(createFilterObject("product"), getReviews)
-    .post(protect, restrictTo("user"), setBodyPropertyToParamsId("product"), createReviewValidator, createReview);
+    .post(protect, restrictTo("user"), setBodyPropertyToParamsId("product",{getUserByToken: true}), createReviewValidator, createReview);
 
 router.route("/:id")
     .get(getReviewByIdValidator, getReviewById)

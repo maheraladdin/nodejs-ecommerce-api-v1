@@ -156,11 +156,15 @@ const setSlug = (req) => {
 /**
  * @desc    set body property to params id
  * @param   {string} propertyToSet - The property to set
- * @param   {string} paramsToGet - The params to get
+ * @param   {object?} options - The options for set
+ * @param   {string?} options.paramsToGet - The params to get
+ * @param   {boolean?} options.getUserByToken - The flag to get user by token
  * @return  {(function(*, *, *): Promise<void>)|*}
  */
-module.exports.setBodyPropertyToParamsId = (propertyToSet,paramsToGet = "id") => async (req,res,next) => {
+module.exports.setBodyPropertyToParamsId = (propertyToSet,options) => async (req,res,next) => {
+    const paramsToGet = options.paramsToGet || "id";
     if(!req.body[propertyToSet]) req.body[propertyToSet] = req.params[paramsToGet];
+    if(!req.body.user && options.getUserByToken) req.body.user = req.user.id;
     next();
 }
 
