@@ -2,7 +2,15 @@ const  {idRule} = require("./RulesFactory");
 const {check} = require("express-validator");
 const RequestError = require("../../RequestError");
 
-const addressExistsHandler = async (value,{req}) => {
+/**
+ * @desc:   Rule checks if address id exists in addresses
+ * @param   {string} value - address id
+ * @param   {object} req - request object
+ * @param   {object} req.user - logged user object
+ * @param   {object} req.user.addresses - logged user addresses
+ * @return  {boolean}
+ */
+const addressExistsHandler = (value,{req}) => {
     const isProductExists = req.user.addresses.some(address => address._id.toString() === value);
     if (!isProductExists) {
         throw new RequestError("Product with provided id does not exist",404);
