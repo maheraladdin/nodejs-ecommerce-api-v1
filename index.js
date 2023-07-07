@@ -13,6 +13,7 @@ const userRoute = require('./routes/userRoute');
 const authRoute = require('./routes/authRoute');
 const reviewRoute = require('./routes/reviewRoute');
 const wishlistRoute = require('./routes/wishlistRoute');
+const addressesRoute = require('./routes/addressesRoute');
 
 // require middlewares
 const errorHandler = require('./middlewares/errorHandlerMW');
@@ -56,6 +57,7 @@ app.use(`${mainPath}/users`,userRoute);
 app.use(`${mainPath}/auth`,authRoute);
 app.use(`${mainPath}/reviews`,reviewRoute);
 app.use(`${mainPath}/wishlist`,wishlistRoute);
+app.use(`${mainPath}/addresses`,addressesRoute);
 
 
 // Error handler middleware for handling all unhandled routes

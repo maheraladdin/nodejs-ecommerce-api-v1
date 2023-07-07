@@ -3,57 +3,56 @@ const User = require("../models/UserModel");
 const asyncHandler = require("express-async-handler");
 
 /**
- * @desc    Get user wishlist
+ * @desc    Get user addresses
  * @param   {object} req - request object
  * @param   {object} req.user - user object
  * @param   {object} req.user.id - user id
  * @param   {object} res - response object
  */
-const getUserWishlistHandler = async (req, res) => {
-    const {wishlist} = await User.findById(req.user.id).populate('wishlist');
+const getUserAddressesHandler = async (req, res) => {
+    const {addresses} = await User.findById(req.user.id).populate('addresses');
     res.status(200).json({
         status: 'success',
         message: 'User wishlist fetched successfully',
-        length: wishlist.length,
-        wishlist
+        length: addresses.length,
+        addresses
     });
 }
 
 /*
- * @route   GET /api/v1/wishlist
+ * @route   GET /api/v1/addresses
  * @desc    Get user wishlist
  * @access  Private (user)
  */
-module.exports.getUserWishlist = asyncHandler(getUserWishlistHandler);
+module.exports.getUserAddresses = asyncHandler(getUserAddressesHandler);
 
 /**
- * @desc    add product to user wishlist
+ * @desc    add address to user addresses
  * @param   {object} req - request object
  * @param   {object} req.body - request body
- * @param   {object} req.body.product - product id
  * @param   {object} req.user - user object
  * @param   {object} req.user.id - user id
  * @param   {object} res - response object
  *
  */
-const addProductToWishlistHandler = async (req, res) => {
-    const {wishlist} = await User.findByIdAndUpdate(req.user.id, {$addToSet: {wishlist: req.body.product}}, {new: true});
+const addAddressToUserAddressesHandler = async (req, res) => {
+    const {addresses} = await User.findByIdAndUpdate(req.user.id, {$addToSet: {addresses: req.body}}, {new: true});
     res.status(200).json({
         status: 'success',
-        message: 'Product added to wishlist successfully',
-        wishlist
+        message: 'Address added to wishlist successfully',
+        addresses
     });
 }
 
 /*
  * @desc    add product to user wishlist
- * @route   PATCH /api/v1/wishlist
+ * @route   PATCH /api/v1/addresses
  * @access  Private (user)
  */
-module.exports.addProductToWishlist = asyncHandler(addProductToWishlistHandler);
+module.exports.addAddressToUserAddresses = asyncHandler(addAddressToUserAddressesHandler);
 
 /**
- * @desc    remove product from user wishlist
+ * @desc    remove address from user addresses
  * @param   {object} req - request object
  * @param   {object} req.params - request params
  * @param   {object} req.params.product - product id
@@ -61,19 +60,19 @@ module.exports.addProductToWishlist = asyncHandler(addProductToWishlistHandler);
  * @param   {object} req.user.id - user id
  * @param   {object} res - response object
  */
-const removeProductFromWishlistHandler = async (req, res) => {
-    const {wishlist} = await User.findByIdAndUpdate(req.user.id, {$pull: {wishlist: req.params.product}}, {new: true});
+const removeAddressFromUserAddressesHandler = async (req, res) => {
+    const {addresses} = await User.findByIdAndUpdate(req.user.id, {$pull: {addresses: {_id: req.params.address}}}, {new: true});
     res.status(200).json({
         message: 'Product removed from wishlist successfully',
         status: 'success',
-        wishlist
+        addresses
     });
 }
 
 /*
  * @desc    remove product from user wishlist
- * @route   DELETE /api/v1/wishlist/:product
+ * @route   DELETE /api/v1/addresses/:address
  * @access  Private (user)
  */
-module.exports.removeProductFromWishlist = asyncHandler(removeProductFromWishlistHandler);
+module.exports.removeAddressFromUserAddresses = asyncHandler(removeAddressFromUserAddressesHandler);
 

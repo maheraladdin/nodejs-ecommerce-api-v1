@@ -50,13 +50,14 @@ const userSchema = new mongoose.Schema({
         default: true,
     },
     // embedded document
-    address: [
+    addresses: [
         {
-            postalCode: Number,
-            address: String,
+            id: mongoose.Schema.Types.ObjectId,
+            alias: String,
+            details: String,
+            phone: String,
             city: String,
-            country: String,
-            flatNumber: Number,
+            postalCode: String,
         }
     ],
     wishlist: [
