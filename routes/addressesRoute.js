@@ -5,7 +5,7 @@ const express = require("express");
 const router = express.Router();
 
 // require utils validators
-// const { addProductToWishlistValidator, removeProductFromWishlistValidator } = require("../utils/ValidationLayer/Validators/wishlistValidators");
+const { addAddressToAddressesValidator, removeAddressFromAddressesValidator } = require("../utils/ValidationLayer/Validators/addressesValidators");
 
 // require controllers
 const { addAddressToUserAddresses, getUserAddresses, removeAddressFromUserAddresses } = require("../controllers/addressesController");
@@ -18,8 +18,8 @@ router.use(protect, restrictTo("user"));
 
 router.route("/")
     .get(getUserAddresses)
-    .post(addAddressToUserAddresses);
+    .post(addAddressToAddressesValidator, addAddressToUserAddresses);
 
-router.delete("/:address", removeAddressFromUserAddresses);
+router.delete("/:address", removeAddressFromAddressesValidator, removeAddressFromUserAddresses);
 
 module.exports = router;

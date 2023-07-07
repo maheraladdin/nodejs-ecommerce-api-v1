@@ -53,7 +53,14 @@ const userSchema = new mongoose.Schema({
     addresses: [
         {
             id: mongoose.Schema.Types.ObjectId,
-            alias: String,
+            alias: {
+                type: String,
+                required: [true, 'An address must have an alias'],
+                trim: true,
+                unique: [true, 'Alias must be unique'],
+                minLength: [3, 'Alias must be at least 3 characters'],
+                maxLength: [20, 'Alias must be at most 20 characters']
+            },
             details: String,
             phone: String,
             city: String,
