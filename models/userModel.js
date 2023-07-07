@@ -100,17 +100,6 @@ const passwordHash = function (next) {
 
 userSchema.pre("save", passwordHash);
 
-/**
- * @desc: Mongoose pre middleware to populate wishlist
- * @param {function} next - next function
- * @return {void}
- */
-const populateWishlist = function (next) {
-    this.populate({path: "wishlist"});
-    next();
-}
-
-userSchema.pre(/^find/, populateWishlist);
 
 module.exports = mongoose.model('User', userSchema);
 

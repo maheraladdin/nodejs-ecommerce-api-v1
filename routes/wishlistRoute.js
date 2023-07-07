@@ -5,7 +5,7 @@ const express = require("express");
 const router = express.Router();
 
 // require utils validators
-// const { getBrandByIdValidator, createBrandValidator, updateBrandValidator, deleteBrandValidator } = require("../utils/ValidationLayer/Validators/brandValidators");
+const { addProductToWishlistValidator, removeProductFromWishlistValidator } = require("../utils/ValidationLayer/Validators/wishlistValidators");
 
 // require controllers
 const { addProductToWishlist, removeProductFromWishlist, getUserWishlist } = require("../controllers/wishlistController");
@@ -18,8 +18,8 @@ router.use(protect, restrictTo("user"));
 
 router.route("/")
     .get(getUserWishlist)
-    .post(addProductToWishlist);
+    .post(addProductToWishlistValidator, addProductToWishlist);
 
-router.delete("/:id", removeProductFromWishlist);
+router.delete("/:product", removeProductFromWishlistValidator, removeProductFromWishlist);
 
 module.exports = router;
