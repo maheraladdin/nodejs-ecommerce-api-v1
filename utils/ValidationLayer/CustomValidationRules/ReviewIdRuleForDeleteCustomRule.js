@@ -16,7 +16,7 @@ module.exports = async (value, {req}) => {
     }
     // check if user is admin or manager then he can delete any review otherwise he can delete only his own reviews
     const user = await User.findById(req.user.id);
-    if(user.role === 'user' && review.user.toString() !== req.user.id) {
+    if(user.role === 'user' && review.user.id.toString() !== req.user.id.toString()) {
         throw new RequestError('You are not allowed to delete this review', 403);
     }
     return true;

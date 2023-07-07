@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
+const Product = require('./productModel');
 
 const reviewSchema = new mongoose.Schema({
-    ratings: {
+    rating: {
         type: Number,
         min: [1, 'Rating must be at least 1'],
         max: [5, 'Rating must can not be more than 5'],
@@ -31,5 +32,37 @@ reviewSchema.pre(/^find/, function (next) {
     });
     next();
 });
+
+/**
+ * @desc    mongoose static method to calculate average ratings and quantity of ratings
+ * @param   {String} productId - product id
+ * @return  {Promise<*>}
+ */
+reviewSchema.statics.calcAverageRatings = async function (productId) {
+    return await this.aggregate([
+        {
+            // select all reviews that match the product id
+            $match: {product: productId}
+        },
+        {
+            // group by product id and calculate average ratings and quantity of ratings
+            $group: {
+                _id: '$product',
+                ratingsQuantity: {$sum: 1},
+                ratingsAverage: {$avg: '$rating'}
+            }
+        }]);
+}
+
+/**
+ * @desc    mongoose post middleware to update average ratings and quantity of ratings after save in Product model
+ * @return  {Promise<void>}
+ */
+const updateAverageRatings = async function () {
+    const [{ratingsQuantity, ratingsAverage}] = await this.constructor.calcAverageRatings(this.product);
+    await Product.findByIdAndUpdate(this.product, {ratingsQuantity, ratingsAverage});
+}
+
+reviewSchema.post('save', updateAverageRatings);
 
 module.exports = mongoose.model('Review', reviewSchema);

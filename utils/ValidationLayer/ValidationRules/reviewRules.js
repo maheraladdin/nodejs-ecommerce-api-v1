@@ -7,7 +7,7 @@ const ReviewIdRuleForUpdateCustomRule = require("../CustomValidationRules/Review
 module.exports.ReviewIdRule = idRule("Review");
 
 // @desc: Rule checks if rating is provided, and is between 1 and 5
-module.exports.ReviewRatingRule = check("ratings")
+module.exports.ReviewRatingRule = check("rating")
     .notEmpty()
     .withMessage("Rating is required")
     .isFloat({min: 1, max: 5})
