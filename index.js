@@ -4,17 +4,6 @@ const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 
-// require routes
-const categoryRoute = require('./routes/categoryRoute');
-const subCategoryRoute = require('./routes/subCategoryRoute');
-const brandRoute = require('./routes/brandRoute');
-const productRoute = require('./routes/productRoute');
-const userRoute = require('./routes/userRoute');
-const authRoute = require('./routes/authRoute');
-const reviewRoute = require('./routes/reviewRoute');
-const wishlistRoute = require('./routes/wishlistRoute');
-const addressesRoute = require('./routes/addressesRoute');
-
 // require middlewares
 const errorHandler = require('./middlewares/errorHandlerMW');
 const RequestError = require("./utils/RequestError");
@@ -43,21 +32,8 @@ app.use(express.urlencoded({ extended: true }));
 // use third party middlewares
 app.use(require("helmet")());
 
-// mainPath
-const mainPath = "/api/v1";
-
-
-
-// Mount routes
-app.use(`${mainPath}/categories`,categoryRoute);
-app.use(`${mainPath}/subCategories`,subCategoryRoute);
-app.use(`${mainPath}/brands`,brandRoute);
-app.use(`${mainPath}/products`,productRoute);
-app.use(`${mainPath}/users`,userRoute);
-app.use(`${mainPath}/auth`,authRoute);
-app.use(`${mainPath}/reviews`,reviewRoute);
-app.use(`${mainPath}/wishlist`,wishlistRoute);
-app.use(`${mainPath}/addresses`,addressesRoute);
+// mount routes
+require('./routes/mountRoutes')(app);
 
 
 // Error handler middleware for handling all unhandled routes
