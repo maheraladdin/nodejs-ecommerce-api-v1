@@ -4,7 +4,6 @@ const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 
-// require custom modules
 // require routes
 const categoryRoute = require('./routes/categoryRoute');
 const subCategoryRoute = require('./routes/subCategoryRoute');
@@ -13,6 +12,7 @@ const productRoute = require('./routes/productRoute');
 const userRoute = require('./routes/userRoute');
 const authRoute = require('./routes/authRoute');
 const reviewRoute = require('./routes/reviewRoute');
+const wishlistRoute = require('./routes/wishlistRoute');
 
 // require middlewares
 const errorHandler = require('./middlewares/errorHandlerMW');
@@ -45,6 +45,8 @@ app.use(require("helmet")());
 // mainPath
 const mainPath = "/api/v1";
 
+
+
 // Mount routes
 app.use(`${mainPath}/categories`,categoryRoute);
 app.use(`${mainPath}/subCategories`,subCategoryRoute);
@@ -53,6 +55,8 @@ app.use(`${mainPath}/products`,productRoute);
 app.use(`${mainPath}/users`,userRoute);
 app.use(`${mainPath}/auth`,authRoute);
 app.use(`${mainPath}/reviews`,reviewRoute);
+app.use(`${mainPath}/wishlist`,wishlistRoute);
+
 
 // Error handler middleware for handling all unhandled routes
 app.all('*',(req,res,next) => {

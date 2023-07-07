@@ -59,10 +59,11 @@ reviewSchema.statics.calcAverageRatings = async function (productId) {
  * @return  {Promise<void>}
  */
 const updateAverageRatings = async function () {
-    const [{ratingsQuantity, ratingsAverage}] = await this.constructor.calcAverageRatings(this.product);
+    const results = await this.constructor.calcAverageRatings(this.product);
+    const [{ratingsQuantity, ratingsAverage}] = results.length ? results : [{ratingsQuantity: 0, ratingsAverage: 0}];
     await Product.findByIdAndUpdate(this.product, {ratingsQuantity, ratingsAverage});
 }
 
-reviewSchema.post('save', updateAverageRatings);
+reviewSchema.post(/(init|save)/, updateAverageRatings);
 
 module.exports = mongoose.model('Review', reviewSchema);
