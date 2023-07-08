@@ -32,6 +32,8 @@ const getCartHandler = async (req, res) => {
 
     // Calculate total cart price
     cart.totalCartPrice = calculateCartPrice(cart);
+    cart.totalCartDiscountedPrice = undefined;
+    cart.coupon = undefined;
     // Save cart
     await cart.save();
 
@@ -97,7 +99,8 @@ const  addItemToCartHandler = async (req, res) => {
 
     // Update total cart price
     cart.totalCartPrice = Math.round(cart.totalCartPrice + price);
-
+    cart.totalCartDiscountedPrice = undefined;
+    cart.coupon = undefined;
     // save cart
     await cart.save();
 
@@ -145,7 +148,8 @@ const updateItemQuantityHandler = async (req, res) => {
 
     // Update total cart price
     cart.totalCartPrice = Math.round(cart.totalCartPrice - item.price * item.quantity + price * req.body.quantity);
-
+    cart.totalCartDiscountedPrice = undefined;
+    cart.coupon = undefined;
     // Update item quantity
     item.quantity = req.body.quantity;
 
@@ -194,7 +198,7 @@ const applyCouponHandler = async (req, res) => {
         throw new RequestError("Cart does not exist for logged user", 404);
 
     // Get coupon from database {name, expireAt, discount, maxDiscount, numberOfUsage }
-    const couponFromDB  = await Coupon.findOne({ name });
+    const couponFromDB  = await Coupon.findOne({ name, expireAt: { $gt: Date.now() } });
 
     // If coupon does not exist, throw error
     if(!couponFromDB)
@@ -205,7 +209,7 @@ const applyCouponHandler = async (req, res) => {
         throw new RequestError("Coupon is already applied", 400);
 
     // If coupon is expired, or is used max number of times, throw error
-    if(couponFromDB.expireAt.getTime() < Date.now() || couponFromDB.numberOfUsage === couponFromDB.maxNumberOfUsage)
+    if(couponFromDB.numberOfUsage === couponFromDB.maxNumberOfUsage)
         throw new RequestError("Coupon is expired", 400);
 
     // Apply coupon to cart
@@ -260,7 +264,8 @@ const deleteItemFromCartHandler = async (req, res) => {
 
     // Update total cart price
     cart.totalCartPrice = Math.round(cart.totalCartPrice - item.price * item.quantity);
-
+    cart.totalCartDiscountedPrice = undefined;
+    cart.coupon = undefined;
     // Remove item from cart
     cart.items = cart.items.filter(item => item._id.toString() !== req.params.id);
 
@@ -302,7 +307,8 @@ const clearCartItemsHandler = async (req, res) => {
 
     // Update total cart price
     cart.totalCartPrice = 0;
-
+    cart.totalCartDiscountedPrice = undefined;
+    cart.coupon = undefined;
     // Remove all items from cart
     cart.items = [];
 
