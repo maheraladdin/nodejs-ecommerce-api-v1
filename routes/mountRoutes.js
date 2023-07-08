@@ -10,6 +10,7 @@ const reviewRoute = require('./reviewRoute');
 const wishlistRoute = require('./wishlistRoute');
 const addressesRoute = require('./addressesRoute');
 const couponRoute = require('./couponRoute');
+const cartRoute = require('./cartRoute');
 
 module.exports = (app) => {
     // mainPath
@@ -26,4 +27,5 @@ module.exports = (app) => {
     app.use(`${mainPath}/wishlist`,wishlistRoute);
     app.use(`${mainPath}/addresses`,addressesRoute);
     app.use(`${mainPath}/coupons`,couponRoute);
+    app.use(`${mainPath}/cart`,cartRoute);
 }
