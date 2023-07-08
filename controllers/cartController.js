@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const RequestError = require('../utils/requestError');
 const Cart = require('../models/cartModel');
 const Product = require('../models/productModel');
+const Coupon = require('../models/couponModel');
 
 /**
  * @desc    Calculate total cart price for logged user
@@ -169,6 +170,73 @@ const updateItemQuantityHandler = async (req, res) => {
 //@body     {number} quantity - item quantity
 //@param    {string} id - item id
 module.exports.updateItemQuantity = asyncHandler(updateItemQuantityHandler);
+
+/**
+ * @desc    Apply coupon to cart
+ * @param   {object} req - request object
+ * @param   {object} req.body - request body
+ * @param   {string} req.body.name - coupon name
+ * @param   {object} req.user - logged user object
+ * @param   {string} req.user._id - logged user id
+ * @param   {object} res - response object
+ * @throws  RequestError if cart does not exist, if coupon does not exist, if coupon is already applied, if coupon is expired, or is used max number of times
+ * @return {Promise<void>}
+ */
+const applyCouponHandler = async (req, res) => {
+    // Get coupon from request body
+    const { name } = req.body;
+
+    // Get cart for logged in user
+    const cart = await Cart.findOne({ user: req.user._id });
+
+    // If cart does not exist, throw error
+    if(!cart)
+        throw new RequestError("Cart does not exist for logged user", 404);
+
+    // Get coupon from database {name, expireAt, discount, maxDiscount, numberOfUsage }
+    const couponFromDB  = await Coupon.findOne({ name });
+
+    // If coupon does not exist, throw error
+    if(!couponFromDB)
+        throw new RequestError("Coupon does not exist", 404);
+
+    // If coupon is already applied, throw error
+    if(cart.coupon && cart.coupon.toString() === couponFromDB._id.toString())
+        throw new RequestError("Coupon is already applied", 400);
+
+    // If coupon is expired, or is used max number of times, throw error
+    if(couponFromDB.expireAt.getTime() < Date.now() || couponFromDB.numberOfUsage === couponFromDB.maxNumberOfUsage)
+        throw new RequestError("Coupon is expired", 400);
+
+    // Apply coupon to cart
+    cart.coupon = couponFromDB._id;
+
+    // Update total cart discount price
+    let discountValue = Math.round(cart.totalCartPrice * couponFromDB.discount / 100);
+    if(discountValue > couponFromDB.maxDiscount) discountValue = couponFromDB.maxDiscount;
+    cart.totalCartDiscountedPrice = Math.round(cart.totalCartPrice - discountValue);
+
+    // Save cart
+    await cart.save();
+
+    // Get cart length
+    const length = cart.items.length;
+
+    // Send response
+    res.status(200).json({
+        status: "success",
+        message: "Coupon applied successfully",
+        couponId: couponFromDB._id,
+        length,
+        cart
+    });
+}
+
+//@desc     Apply coupon to cart
+//@route    PATCH /api/cart/applyCoupon
+//@access   Private (user)
+//@body     {string} name - coupon name
+module.exports.applyCoupon = asyncHandler(applyCouponHandler);
 
 /**
  * @desc    Delete Item from Cart based on item id

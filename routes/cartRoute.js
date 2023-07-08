@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true});
 
-const { addItemToCart, getCart, deleteItemFromCart, clearCartItems, updateItemQuantity } = require('../controllers/cartController');
+const { addItemToCart, getCart, deleteItemFromCart, clearCartItems, updateItemQuantity,applyCoupon } = require('../controllers/cartController');
 
 const { protect, restrictTo } = require('../controllers/authController');
 
@@ -12,6 +12,8 @@ router.route('/')
     .get(getCart)
     .post(addItemToCart)
     .delete(clearCartItems);
+
+router.patch('/applyCoupon', applyCoupon);
 
 router.route('/:id')
     .patch(updateItemQuantity)

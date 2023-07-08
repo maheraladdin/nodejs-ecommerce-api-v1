@@ -17,6 +17,20 @@ const couponSchema = new mongoose.Schema({
         required: [true, 'A coupon must have a discount'],
         min: [0, 'Discount must be at least 0'],
         max: [100, 'Discount must be at most 100'],
+    },
+    maxDiscount: {
+        type: Number,
+        min: [1, 'Max discount must be at least 1'],
+    },
+    numberOfUsage: {
+        type: Number,
+        default: 0,
+        min: [0, 'Number of usage must be at least 0'],
+    },
+    maxNumberOfUsage: {
+        type: Number,
+        default: 1,
+        min: [1, 'Max number of usage must be at least 1'],
     }
 },{timestamps: true});
 

@@ -18,7 +18,11 @@ const cartSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.ObjectId,
         ref: "User",
-    }
+    },
+    coupon: {
+        type: mongoose.Schema.ObjectId,
+        ref: "Coupon",
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Cart", cartSchema);
