@@ -1,6 +1,8 @@
 
 const express = require('express');
-const router = express.Router({ mergeParams: true});
+const router = express.Router();
+
+const { addItemToCartValidator, applyCouponValidator, deleteItemFromCartValidator, updateItemQuantityValidator } = require('../utils/ValidationLayer/Validators/cartValidators');
 
 const { addItemToCart, getCart, deleteItemFromCart, clearCartItems, updateItemQuantity,applyCoupon } = require('../controllers/cartController');
 
@@ -10,13 +12,13 @@ router.use(protect, restrictTo("user"));
 
 router.route('/')
     .get(getCart)
-    .post(addItemToCart)
+    .post(addItemToCartValidator, addItemToCart)
     .delete(clearCartItems);
 
-router.patch('/applyCoupon', applyCoupon);
+router.patch('/applyCoupon', applyCouponValidator, applyCoupon);
 
 router.route('/:id')
-    .patch(updateItemQuantity)
-    .delete(deleteItemFromCart);
+    .patch(updateItemQuantityValidator, updateItemQuantity)
+    .delete(deleteItemFromCartValidator, deleteItemFromCart);
 
 module.exports = router;
