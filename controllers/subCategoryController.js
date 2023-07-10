@@ -3,22 +3,11 @@ const {deleteOne, getAll, getOne, updateOne, createOne} = require("./handlersFac
 const SubCategoryModel = require('../models/subCategoryModel.js');
 
 /**
- * @desc    Use in nested get route to set filter object for getting subCategories
- * @param   {object} req - The request object
- * @param   {object} res - The response object
- * @param   {function} next - The next middleware
- */
-module.exports.createFilterObject = (req, res, next) => {
-    const { id } = req.params;
-    req.filter = id ? { category: id } : {};
-    next();
-}
-/**
  * @desc    Get all subCategories
  * @route   GET /api/v1/subCategories || /api/v1/Categories/:id/subCategories
  * @access  Public
  */
-module.exports.getAllSubCategories = getAll(SubCategoryModel, 'SubCategory',{nested: true});
+module.exports.getAllSubCategories = getAll(SubCategoryModel);
 /**
  * @desc    Get a subCategory by id
  * @route   GET /api/v1/subCategories/:id

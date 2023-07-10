@@ -57,4 +57,11 @@ const orderSchema = new mongoose.Schema({
     cancelledAt: Date,
 },{timestamps: true});
 
+orderSchema.pre(/^find/, function (next) {
+    this
+        .populate({path: 'user', select: 'name email phone profileImg'})
+        .populate({path: 'items.product', select: 'title imageCover'});
+    next();
+});
+
 module.exports = mongoose.model('orders', orderSchema);

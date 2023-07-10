@@ -62,7 +62,7 @@ module.exports.optimizeImage = (options = {}) => asyncHandler(async (req, res, n
 module.exports.createFilterObject = (propertyToFilterBy) =>
     (req, res, next) => {
     const { id } = req.params;
-    req.filter = id ? { [propertyToFilterBy]: id } : {};
+    req.filterObj = id ? { [propertyToFilterBy]: id } : {};
     next();
 }
 
@@ -70,19 +70,19 @@ module.exports.createFilterObject = (propertyToFilterBy) =>
  * @desc    Get all documents
  * @access  Public
  * @param  {Model} Model - The model to get from
- * @param  {string?} kind - The kind of document
- * @param  {object?} options - The options for get
- * @param  {boolean?} options.nested - The options nested flag
  * @return {object} - The response object
  */
-module.exports.getAll = (Model,kind = "Document",options = {}) => asyncHandler(async (req, res) => {
+module.exports.getAll = (Model) => asyncHandler(async (req, res) => {
+
+    console.log(req.filterObj);
+    // filter object
+    const filter = req.filterObj ? req.filterObj : {};
+
     // number of documents in collection
     const countDocuments = await Model.countDocuments();
-    // Build query
-    const mongooseInitiateQuery = options.nested ? Model.find(req.filter) : Model.find();
 
     // Create ApiFeatures instance
-    const ApiFeaturesInstance = new ApiFeatures(mongooseInitiateQuery, req.query)
+    const ApiFeaturesInstance = new ApiFeatures(Model.find(filter), req.query)
         .pagination(countDocuments)
         .filterByField()
         .searchWithKeyword()
@@ -315,7 +315,7 @@ module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandle
 
     // check if document exists
     if (!document)
-        throw new RequestError(`${kind} not found for id: ${id}`, 404);
+        throw new RequestError(`${kind} not found for provided id`, 404);
 
     // add document to response
     response.document = document;
