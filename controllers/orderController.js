@@ -248,7 +248,7 @@ module.exports.getCheckoutSession = asyncHandler(async (req, res,next) => {
         success_url: `${req.protocol}://${req.get('host')}/api/v1/orders/${cart._id}/orders`,
         cancel_url: `${req.protocol}://${req.get('host')}/api/v1/orders/${cart._id}/cart`,
         customer_email: req.user.email,
-        client_reference_id: cart._id,
+        client_reference_id: req.params.id,
         metadata: {
             shippingAddress: JSON.stringify(userShippingAddress),
         },
@@ -282,13 +282,6 @@ const createOrder = async (session) => {
     const total = session.amount_total / 100;
     const email = session.customer_email;
     const {amount_tax: tax, amount_shipping: shipping} = session.total_details
-
-    console.log(cartId)
-    console.log(shippingAddress)
-    console.log(total)
-    console.log(email)
-    console.log(tax)
-    console.log(shipping)
 
 
     // Get cart from db using cart id
@@ -329,7 +322,6 @@ const webhookCheckoutHandler = async (req, res) => {
 
     const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET_KEY);
 
-    console.log("I am now inside the stripe webhook");
     // Handle the event
     const order = event.type === 'checkout.session.completed' ? await createOrder(event.data.object) : "Error while creating order";
 
