@@ -1,4 +1,9 @@
 
+
+// require third party modules
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+// require custom modules
 const asyncHandler = require('express-async-handler');
 const Order = require('../models/orderModel');
 const Cart = require('../models/cartModel');
@@ -165,17 +170,106 @@ const updateStatusHandler = (status) => async (req,res) => {
 // @desc    Update order pay status
 // @route   PATCH /api/v1/orders/:id/pay
 // @access  Private (admin, manager)
+// @body    isPaid: boolean
 module.exports.updateOrderPaidStatus = asyncHandler(updateStatusHandler("isPaid"));
 
 // @desc    Update order deliver status
 // @route   PATCH /api/v1/orders/:id/deliver
 // @access  Private (admin, manager)
+// @body    isDelivered: boolean
 module.exports.updateOrderDeliverStatus = asyncHandler(updateStatusHandler("isDelivered"));
 
 // @desc    Update order cancel status
 // @route   PATCH /api/v1/orders/:id/cancel
 // @access  Protected
+// @body    isCancelled: boolean
 module.exports.updateOrderCancelStatus = asyncHandler(updateStatusHandler("isCancelled"));
+
+// @desc    Get checkout session for stripe payment
+// @route   GET /api/v1/orders/:id/checkout-session
+// @access  Private (user)
+// @params  id: cart id (cart to be ordered)
+module.exports.getCheckoutSession = asyncHandler(async (req, res,next) => {
+    // app settings
+    const tax = 0;
+    const shipping = 0;
+    // Get cart by id
+    const cart = await Cart.findById(req.params.id);
+
+    if (!cart) return next(new RequestError('No cart found with that id', 404));
+
+    // Check if cart belongs to user
+    if (cart.user.toString() !== req.user._id.toString()) return next(new RequestError('Not authorized to access this cart', 401));
+
+    // Check if cart is empty
+    if (cart.items.length === 0) return next(new RequestError('Cart is empty', 400));
+
+    // Get order cart price from cart total price , in case of coupon applied, the cart price is cart discounted price
+    const cartPrice = cart.coupon ? cart.totalCartDiscountedPrice : cart.totalCartPrice;
+
+    // Get total price
+    const total = cartPrice + tax + shipping;
+
+    // Get address to deliver from user addresses
+    const shippingAddress = req.user.addresses.find((address) => address.alias === req.body.shippingAddress);
+
+    // Check if address doesn't exist
+    if(!shippingAddress) next(new RequestError('No address found with that alias', 404));
+
+    // Create stripe checkout session
+    const session = await stripe.checkout.sessions.create({
+        line_items: [
+            {
+                price_data: {
+                    currency: 'egp',
+                    unit_amount: total * 100,
+                    product_data: {
+                        name: req.user.name,
+                        images: [req.user.profileImg],
+                    }
+                },
+                quantity: 1,
+            }
+        ],
+        mode: 'payment',
+        success_url: `${req.protocol}://${req.get('host')}/api/v1/orders/${cart._id}/orders`,
+        cancel_url: `${req.protocol}://${req.get('host')}/api/v1/orders/${cart._id}/cart`,
+        customer_email: req.user.email,
+        client_reference_id: cart._id,
+        metadata: {
+            shippingAddress,
+        }
+    });
+
+    if(!session) return next(new RequestError('Checkout session not created', 500));
+
+    // after creating session
+
+    // increase coupon numberOfUsage by 1
+    if(cart.coupon) await Coupon.findByIdAndUpdate(cart.coupon, { $inc: { numberOfUsage: 1 } });
+
+    // update products quantity and sold fields in db
+    const bulkOptions = cart.items.map((item) => {
+        return {
+            updateOne: {
+                filter: { _id: item.product },
+                update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+            },
+        };
+    });
+    await Product.bulkWrite(bulkOptions,{});
+
+    // delete cart
+    await Cart.findByIdAndDelete(req.params.id);
+
+    // return session
+    res.status(200).json({
+        status: "success",
+        message: "Checkout session created successfully",
+        session,
+    })
+
+});
 
 
 

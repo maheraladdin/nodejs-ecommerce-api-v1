@@ -2,13 +2,16 @@ const express = require('express');
 const router = express.Router();
 
 // require controllers
-const {createCashOrder, belongsToUser, filterOrdersForLoggedUser, getOrder, getOrders, updateOrderCancelStatus, updateOrderDeliverStatus, updateOrderPaidStatus} = require('../controllers/orderController');
+const {createCashOrder, belongsToUser, filterOrdersForLoggedUser, getOrder, getOrders, updateOrderCancelStatus, updateOrderDeliverStatus, updateOrderPaidStatus, getCheckoutSession} = require('../controllers/orderController');
 
 // require auth controllers
 const {protect, restrictTo} = require('../controllers/authController');
 
 // routes
 router.use(protect);
+
+router.get("/:id/checkout-session", restrictTo("user"), getCheckoutSession)
+
 
 router.route('/')
     .get(filterOrdersForLoggedUser, getOrders);
