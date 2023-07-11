@@ -35,6 +35,7 @@ app.use(express.urlencoded({ extended: true }));
 // use third party middlewares
 
 // use helmet middleware for setting http headers for security
+app.use(require("helmet")());
 
 // use cors middleware for enabling cors requests
 app.use(cors());
