@@ -4,8 +4,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const cors = require('cors');
-const compression = require('compression')
-
+const compression = require('compression');
 
 // require middlewares
 const errorHandler = require('./middlewares/errorHandlerMW');
@@ -27,11 +26,6 @@ process.env.NODE_ENV === "development" && app.use(morgan('dev')) && console.log(
 
 // use express middlewares
 
-// use express.json() to parse json data from request body
-app.use(express.json());
-// use express.urlencoded() to parse urlencoded data from request body
-app.use(express.urlencoded({ extended: true }));
-
 // use third party middlewares
 
 // use helmet middleware for setting http headers for security
@@ -43,6 +37,13 @@ app.options("*", cors());
 
 // compress all responses
 app.use(compression());
+
+// stripe webhook
+const {webhookCheckout} = require("./controllers/orderController");
+app.post("/webhook-checkout",express.raw({type: 'application/json'}), webhookCheckout)
+
+// use express.json() to parse json data from request body
+app.use(express.json());
 
 // mount routes
 require('./routes/mountRoutes')(app);
