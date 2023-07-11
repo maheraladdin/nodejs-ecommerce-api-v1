@@ -283,6 +283,14 @@ const createOrder = async (session) => {
     const email = session.customer_email;
     const {amount_tax: tax, amount_shipping: shipping} = session.total_details
 
+    console.log(cartId)
+    console.log(shippingAddress)
+    console.log(total)
+    console.log(email)
+    console.log(tax)
+    console.log(shipping)
+
+
     // Get cart from db using cart id
     const cart = await Cart.findById(cartId);
 
@@ -321,6 +329,7 @@ const webhookCheckoutHandler = async (req, res) => {
 
     const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET_KEY);
 
+    console.log("I am now inside the stripe webhook");
     // Handle the event
     const order = event.type === 'checkout.session.completed' ? await createOrder(event.data.object) : "Error while creating order";
 
