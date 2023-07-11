@@ -8,7 +8,7 @@ const router = express.Router();
 const { getUserByIdValidator, createUserValidator, updateUserValidator, updateUserPasswordValidator, deleteUserValidator, updateUserRoleValidator, updateLoggedUserDataValidator } = require("../utils/ValidationLayer/Validators/userValidators");
 
 // require controllers
-const { getUsers, getUserById, createUser, updateUserById, deleteUserById, uploadUserProfileImg, optimizeUserProfileImg, updateUserPassword, updateUserRole, reactiveAccountById, reactiveLoggedUserAccount, updateLoggedUserPassword, updateLoggedUserData, deleteLoggedUserAccount } = require("../controllers/UserController");
+const { getUsers, getUserById, createUser, updateUserById, deleteUserById, uploadUserProfileImg, optimizeUserProfileImg, updateUserPassword, updateUserRole, reactiveAccountById, reactiveLoggedUserAccount, updateLoggedUserPassword, updateLoggedUserData, deleteLoggedUserAccount } = require("../controllers/userController");
 
 // require auth controllers
 const { protect, restrictTo } = require("../controllers/authController");
