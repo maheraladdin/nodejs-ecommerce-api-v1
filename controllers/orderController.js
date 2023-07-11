@@ -237,7 +237,8 @@ module.exports.getCheckoutSession = asyncHandler(async (req, res,next) => {
         customer_email: req.user.email,
         client_reference_id: cart._id,
         metadata: {
-            shippingAddress,
+            // remember to stringify metadata
+            shippingAddress: JSON.stringify(shippingAddress),
         }
     });
 
