@@ -1,5 +1,5 @@
 const Review = require('../../../models/reviewModel');
-const User = require('../../../models/UserModel');
+const User = require('../../../models/userModel');
 const RequestError = require('../../../utils/RequestError');
 
 /**

@@ -1,6 +1,6 @@
 // require custom modules
 const RequestError = require("../../RequestError");
-const User = require("../../../models/UserModel");
+const User = require("../../../models/userModel");
 // This rule is used to prevent users from changing their own role or other users role if they have less privileges
 // permissionsHierarchy
 module.exports = async (value, { req }) => {
