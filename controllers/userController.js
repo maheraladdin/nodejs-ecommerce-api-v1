@@ -1,7 +1,7 @@
 // Description: Handle User requests.
 const {deleteOne, getAll, getOne, updateOne, createOne, optimizeImage} = require("./handlersFactory");
 const upload = require("../middlewares/uploadImageMW");
-const User = require("../models/UserModel");
+const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 
 /*
