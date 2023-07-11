@@ -243,24 +243,26 @@ module.exports.getCheckoutSession = asyncHandler(async (req, res,next) => {
 
     if(!session) return next(new RequestError('Checkout session not created', 500));
 
+
+
     // after creating session
 
-    // increase coupon numberOfUsage by 1
-    if(cart.coupon) await Coupon.findByIdAndUpdate(cart.coupon, { $inc: { numberOfUsage: 1 } });
-
-    // update products quantity and sold fields in db
-    const bulkOptions = cart.items.map((item) => {
-        return {
-            updateOne: {
-                filter: { _id: item.product },
-                update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
-            },
-        };
-    });
-    await Product.bulkWrite(bulkOptions,{});
-
-    // delete cart
-    await Cart.findByIdAndDelete(req.params.id);
+    // // increase coupon numberOfUsage by 1
+    // if(cart.coupon) await Coupon.findByIdAndUpdate(cart.coupon, { $inc: { numberOfUsage: 1 } });
+    //
+    // // update products quantity and sold fields in db
+    // const bulkOptions = cart.items.map((item) => {
+    //     return {
+    //         updateOne: {
+    //             filter: { _id: item.product },
+    //             update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+    //         },
+    //     };
+    // });
+    // await Product.bulkWrite(bulkOptions,{});
+    //
+    // // delete cart
+    // await Cart.findByIdAndDelete(req.params.id);
 
     // return session
     res.status(200).json({

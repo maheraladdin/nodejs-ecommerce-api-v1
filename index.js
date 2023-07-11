@@ -3,6 +3,9 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
+const cors = require('cors');
+const compression = require('compression')
+
 
 // require middlewares
 const errorHandler = require('./middlewares/errorHandlerMW');
@@ -30,7 +33,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // use third party middlewares
-app.use(require("helmet")());
+
+// use helmet middleware for setting http headers for security
+
+// use cors middleware for enabling cors requests
+app.use(cors());
+app.options("*", cors());
+
+// compress all responses
+app.use(compression());
 
 // mount routes
 require('./routes/mountRoutes')(app);
