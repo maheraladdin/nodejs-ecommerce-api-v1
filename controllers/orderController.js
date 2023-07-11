@@ -9,6 +9,7 @@ const Order = require('../models/orderModel');
 const Cart = require('../models/cartModel');
 const Product = require('../models/productModel');
 const Coupon = require('../models/couponModel');
+const User = require('../models/userModel');
 const RequestError = require('../utils/requestError');
 const {getAll, getOne} = require("./handlersFactory");
 
@@ -60,6 +61,33 @@ module.exports.belongsToUser = asyncHandler(belongsToUserHandler);
 // @access  Protected
 // @params  {String} id - order id
 module.exports.getOrder = getOne(Order, "Order");
+
+/**
+ * @desc    this middleware handle status after checkout completed and order created
+ * @param   {Cart} cart - cart object
+ * @param   {String} cart.coupon - coupon applied on cart
+ * @param   {Array} cart.items - cart items
+ * @param   {String} cart._id - cart id
+ * @return {Promise<void>}
+ */
+const handleStatusAfterCheckout = async (cart) => {
+    // increase coupon numberOfUsage by 1
+    if(cart.coupon) await Coupon.findByIdAndUpdate(cart.coupon, { $inc: { numberOfUsage: 1 } });
+
+    // update products quantity and sold fields in db
+    const bulkOptions = cart.items.map((item) => {
+        return {
+            updateOne: {
+                filter: { _id: item.product },
+                update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+            },
+        };
+    });
+    await Product.bulkWrite(bulkOptions,{});
+
+    // delete cart
+    await Cart.findByIdAndDelete(cart._id.toString());
+}
 
 /**
  * @desc    Create a new order with cash payment method (Cash on delivery)
@@ -118,22 +146,7 @@ const createCashOrderHandler = async (req, res, next) => {
     // Check if order didn't create
     if(!order) next(new RequestError('Order not created', 500));
 
-    // increase coupon numberOfUsage by 1
-    if(cart.coupon) await Coupon.findByIdAndUpdate(cart.coupon, { $inc: { numberOfUsage: 1 } });
-
-    // update products quantity and sold fields in db
-    const bulkOptions = cart.items.map((item) => {
-        return {
-            updateOne: {
-                filter: { _id: item.product },
-                update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
-            },
-        };
-    });
-    await Product.bulkWrite(bulkOptions,{});
-
-    // delete cart
-    await Cart.findByIdAndDelete(req.params.id);
+    await handleStatusAfterCheckout(cart);
 
     // return order
     res.status(201).json({
@@ -236,34 +249,10 @@ module.exports.getCheckoutSession = asyncHandler(async (req, res,next) => {
         cancel_url: `${req.protocol}://${req.get('host')}/api/v1/orders/${cart._id}/cart`,
         customer_email: req.user.email,
         client_reference_id: cart._id,
-        metadata: {
-            // remember to stringify metadata
-            shippingAddress: JSON.stringify(shippingAddress),
-        }
+        metadata: shippingAddress,
     });
 
     if(!session) return next(new RequestError('Checkout session not created', 500));
-
-
-
-    // after creating session
-
-    // // increase coupon numberOfUsage by 1
-    // if(cart.coupon) await Coupon.findByIdAndUpdate(cart.coupon, { $inc: { numberOfUsage: 1 } });
-    //
-    // // update products quantity and sold fields in db
-    // const bulkOptions = cart.items.map((item) => {
-    //     return {
-    //         updateOne: {
-    //             filter: { _id: item.product },
-    //             update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
-    //         },
-    //     };
-    // });
-    // await Product.bulkWrite(bulkOptions,{});
-    //
-    // // delete cart
-    // await Cart.findByIdAndDelete(req.params.id);
 
     // return session
     res.status(200).json({
@@ -273,6 +262,77 @@ module.exports.getCheckoutSession = asyncHandler(async (req, res,next) => {
     })
 
 });
+
+/**
+ * @desc    create an order for stripe session
+ * @param   {Object} session - stripe session object
+ * @param   {String} session.client_reference_id - cart id
+ * @param   {Object} session.metadata - shipping address object
+ * @param   {Number} session.amount_total - total price for cart
+ * @param   {String} session.customer_email - user email address
+ * @param   {Number} session.total_details.amount_tax - tax on cart
+ * @param   {Number} session.total_details.amount_shipping - shipping on cart
+ * @return {Promise<Document<unknown, {}, unknown> & Omit<unknown extends {_id?: infer U} ? IfAny<U, {_id: Types.ObjectId}, Required<{_id: U}>> : {_id: Types.ObjectId}, never> & {}>}
+ */
+const createOrder = async (session) => {
+    const cartId = session.client_reference_id;
+    const shippingAddress = session.metadata;
+    const total = session.amount_total / 100;
+    const email = session.customer_email;
+    const tax = session.total_details.amount_tax;
+    const shipping = session.total_details.amount_shipping;
+
+    // Get cart from db using cart id
+    const cart = await Cart.findById(cartId);
+
+    // Get user from db using email
+    const user = await User.findOne({email});
+
+    // Create order
+    const order = await Order.create({
+        user: user._id,
+        items: cart.items,
+        tax,
+        shipping,
+        total,
+        shippingAddress,
+        isPaid: true,
+        paidAt: Date.now(),
+        paymentMethod: "card",
+    });
+
+    // Check if order didn't create
+    if(!order) throw new RequestError('Order not created', 500);
+
+    await handleStatusAfterCheckout(cart);
+
+    return order;
+}
+
+/**
+ * @desc    webhook handler for stripe checkout complete event
+ * @param   {Object} req - request object
+ * @param   {Object} res - response object
+ * @return {Promise<void>}
+ */
+const webhookCheckoutHandler = async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+
+    const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET_KEY);
+
+    // Handle the event
+    const order = event.type === 'checkout.session.completed' ? await createOrder(event.data.object) : "Error while creating order";
+
+    // Return a 200 response to acknowledge receipt of the event
+    res.status(200).json({
+        status: "success",
+        order
+    });
+}
+
+// @desc    stripe webhook execute after completing checkout
+// @route   /api/v1/orders/webhook-checkout
+module.exports.webhookCheckout = asyncHandler(webhookCheckoutHandler);
 
 
 

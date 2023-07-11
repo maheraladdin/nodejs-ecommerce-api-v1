@@ -24,7 +24,7 @@ const orderSchema = new mongoose.Schema({
     paymentMethod: {
         type: String,
         required: [true, 'Order must have a payment intent'],
-        enum: ["card", "cash", "paypal"],
+        enum: ["card", "cash"],
         default: "cash",
     },
     isPaid: {
