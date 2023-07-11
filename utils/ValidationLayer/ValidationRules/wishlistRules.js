@@ -1,6 +1,6 @@
 const  {idRule} = require("./RulesFactory");
 const Product = require("../../../models/productModel");
-const RequestError = require("../../RequestError");
+const RequestError = require("../../requestError");
 
 /**
  * @desc: Rule checks if product with provided id exists

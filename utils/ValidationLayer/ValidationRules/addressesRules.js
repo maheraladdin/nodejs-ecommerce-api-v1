@@ -1,6 +1,6 @@
 const  {idRule} = require("./RulesFactory");
 const {check} = require("express-validator");
-const RequestError = require("../../RequestError");
+const RequestError = require("../../requestError");
 
 /**
  * @desc:   Rule checks if address id exists in addresses

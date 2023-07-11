@@ -1,5 +1,5 @@
 // Purpose: Multer middleware for uploading one image
-const RequestError = require("../utils/RequestError");
+const RequestError = require("../utils/requestError");
 const multer = require("multer");
 
 /**

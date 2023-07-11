@@ -1,5 +1,5 @@
 const Category = require("../../../models/categoryModel");
-const RequestError = require("../../RequestError");
+const RequestError = require("../../requestError");
 
 /**
  * @desc Check if category exists

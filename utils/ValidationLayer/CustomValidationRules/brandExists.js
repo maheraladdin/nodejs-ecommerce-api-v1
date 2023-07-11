@@ -1,5 +1,5 @@
 const Brand = require("../../../models/brandModel");
-const RequestError = require("../../RequestError");
+const RequestError = require("../../requestError");
 
 /**
  * @desc Check if brand exists

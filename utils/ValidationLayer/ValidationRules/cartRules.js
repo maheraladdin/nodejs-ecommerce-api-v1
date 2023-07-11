@@ -2,7 +2,7 @@ const {check} = require('express-validator');
 const Product = require('../../../models/productModel');
 const Coupon = require('../../../models/couponModel');
 const { idRule } = require('./RulesFactory');
-const RequestError = require('../../RequestError');
+const RequestError = require('../../requestError');
 
 
 /**

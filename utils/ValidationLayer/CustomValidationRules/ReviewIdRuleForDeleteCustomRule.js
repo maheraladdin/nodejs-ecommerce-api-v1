@@ -1,6 +1,6 @@
 const Review = require('../../../models/reviewModel');
 const User = require('../../../models/userModel');
-const RequestError = require('../../../utils/RequestError');
+const RequestError = require('../../requestError');
 
 /**
  * @desc: Rule checks if the user role is admin or manager then he can delete any review otherwise he can delete only his own reviews

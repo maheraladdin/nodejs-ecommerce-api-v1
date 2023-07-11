@@ -1,7 +1,7 @@
 // @desc: Error handler middleware
 // @usage: use this middleware at the end of all routes
 
-const RequestError = require("../utils/RequestError");
+const RequestError = require("../utils/requestError");
 
 /**
  * @desc: Error handler middleware

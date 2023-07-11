@@ -1,5 +1,5 @@
 const User = require("../../../models/userModel");
-const requestError = require("../../RequestError");
+const requestError = require("../../requestError");
 
 /**
  * @desc: Rule checks if User phone is in use

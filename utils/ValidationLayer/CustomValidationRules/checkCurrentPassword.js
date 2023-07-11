@@ -1,5 +1,5 @@
 const User = require('../../../models/userModel');
-const RequestError = require('../../../utils/RequestError');
+const RequestError = require('../../requestError');
 const bcrypt = require("bcrypt");
 
 /**

@@ -1,6 +1,6 @@
 
 const Review = require('../../../models/reviewModel');
-const RequestError = require('../../../utils/RequestError');
+const RequestError = require('../../requestError');
 
 
 /**

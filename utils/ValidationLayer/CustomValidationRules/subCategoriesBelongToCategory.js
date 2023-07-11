@@ -1,5 +1,5 @@
 const SubCategory = require('../../../models/subCategoryModel');
-const RequestError = require("../../RequestError");
+const RequestError = require("../../requestError");
 
 /**
  * @desc Check if subCategories belong to category

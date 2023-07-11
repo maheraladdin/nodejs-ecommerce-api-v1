@@ -1,4 +1,4 @@
-const RequestError = require("../../RequestError");
+const RequestError = require("../../requestError");
 
 /**
  * @desc    Check if product discounted price is less than product price

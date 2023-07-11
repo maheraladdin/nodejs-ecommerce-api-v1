@@ -1,4 +1,4 @@
-const RequestError = require('../../RequestError');
+const RequestError = require('../../requestError');
 
 /**
  * @desc: Rule checks if password and passwordConfirmation are the same

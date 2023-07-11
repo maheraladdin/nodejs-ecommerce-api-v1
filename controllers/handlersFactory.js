@@ -7,7 +7,7 @@ const sharp = require("sharp");
 const bcrypt = require("bcrypt");
 
 // require custom modules
-const RequestError = require("../utils/RequestError");
+const RequestError = require("../utils/requestError");
 const ApiFeatures = require("../utils/ApiFeatures");
 const jwt = require("jsonwebtoken");
 

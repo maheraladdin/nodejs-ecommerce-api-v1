@@ -9,7 +9,7 @@ const bcrypt = require("bcrypt");
 
 // require custom modules
 const asyncHandler = require("express-async-handler");
-const RequestError = require("../utils/RequestError");
+const RequestError = require("../utils/requestError");
 const User = require("../models/userModel");
 const {createOne,generateToken} = require("./handlersFactory");
 const sendEmail = require("../utils/sendEmail");

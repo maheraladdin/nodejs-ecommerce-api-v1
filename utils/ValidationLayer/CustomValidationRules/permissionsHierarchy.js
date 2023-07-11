@@ -1,5 +1,5 @@
 // require custom modules
-const RequestError = require("../../RequestError");
+const RequestError = require("../../requestError");
 const User = require("../../../models/userModel");
 // This rule is used to prevent users from changing their own role or other users role if they have less privileges
 // permissionsHierarchy

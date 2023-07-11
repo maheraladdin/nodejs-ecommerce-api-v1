@@ -1,5 +1,5 @@
 const User = require('../../../models/userModel');
-const RequestError = require("../../RequestError");
+const RequestError = require("../../requestError");
 
 /**
  * @desc    Check if email is already in use

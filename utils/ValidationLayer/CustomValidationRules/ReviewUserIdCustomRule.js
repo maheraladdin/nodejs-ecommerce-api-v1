@@ -1,5 +1,5 @@
 const Review = require("../../../models/reviewModel");
-const RequestError = require("../../RequestError");
+const RequestError = require("../../requestError");
 const User = require("../../../models/userModel");
 const Product = require("../../../models/productModel");
 module.exports = async (value, {req}) => {

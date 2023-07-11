@@ -9,7 +9,7 @@ const compression = require('compression')
 
 // require middlewares
 const errorHandler = require('./middlewares/errorHandlerMW');
-const RequestError = require("./utils/RequestError");
+const RequestError = require("./utils/requestError");
 
 // load env variables from config.env
 dotenv.config({ path: './config.env' });
