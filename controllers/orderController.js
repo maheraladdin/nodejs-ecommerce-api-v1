@@ -224,10 +224,10 @@ module.exports.getCheckoutSession = asyncHandler(async (req, res,next) => {
     const total = cartPrice + tax + shipping;
 
     // Get address to deliver from user addresses
-    const shippingAddress = req.user.addresses.find((address) => address.alias === req.body.shippingAddress);
+    const userShippingAddress = req.user.addresses.find((address) => address.alias === req.body.shippingAddress);
 
     // Check if address doesn't exist
-    if(!shippingAddress) next(new RequestError('No address found with that alias', 404));
+    if(!userShippingAddress) next(new RequestError('No address found with that alias', 404));
 
     // Create stripe checkout session
     const session = await stripe.checkout.sessions.create({
@@ -249,7 +249,9 @@ module.exports.getCheckoutSession = asyncHandler(async (req, res,next) => {
         cancel_url: `${req.protocol}://${req.get('host')}/api/v1/orders/${cart._id}/cart`,
         customer_email: req.user.email,
         client_reference_id: cart._id,
-        metadata: shippingAddress,
+        metadata: {
+            shippingAddress: userShippingAddress,
+        },
     });
 
     if(!session) return next(new RequestError('Checkout session not created', 500));
@@ -267,7 +269,7 @@ module.exports.getCheckoutSession = asyncHandler(async (req, res,next) => {
  * @desc    create an order for stripe session
  * @param   {Object} session - stripe session object
  * @param   {String} session.client_reference_id - cart id
- * @param   {Object} session.metadata - shipping address object
+ * @param   {Object} session.metadata.shippingAddress - shipping address object
  * @param   {Number} session.amount_total - total price for cart
  * @param   {String} session.customer_email - user email address
  * @param   {Number} session.total_details.amount_tax - tax on cart
@@ -276,11 +278,10 @@ module.exports.getCheckoutSession = asyncHandler(async (req, res,next) => {
  */
 const createOrder = async (session) => {
     const cartId = session.client_reference_id;
-    const shippingAddress = session.metadata;
+    const shippingAddress = session.metadata.shippingAddress;
     const total = session.amount_total / 100;
     const email = session.customer_email;
-    const tax = session.total_details.amount_tax;
-    const shipping = session.total_details.amount_shipping;
+    const {amount_tax: tax, amount_shipping: shipping} = session.total_details
 
     // Get cart from db using cart id
     const cart = await Cart.findById(cartId);
