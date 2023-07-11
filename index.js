@@ -10,7 +10,6 @@ const compression = require('compression')
 // require middlewares
 const errorHandler = require('./middlewares/errorHandlerMW');
 const RequestError = require("./utils/requestError");
-const {webhookCheckout} = require("./controllers/orderController");
 
 // load env variables from config.env
 dotenv.config({ path: './config.env' });
@@ -26,8 +25,12 @@ const app = express();
 // use morgan for logging requests in development mode
 process.env.NODE_ENV === "development" && app.use(morgan('dev')) && console.log('Morgan enabled for development');
 
-
 // use express middlewares
+
+// use express.json() to parse json data from request body
+app.use(express.json());
+// use express.urlencoded() to parse urlencoded data from request body
+app.use(express.urlencoded({ extended: true }));
 
 // use third party middlewares
 
@@ -40,15 +43,6 @@ app.options("*", cors());
 
 // compress all responses
 app.use(compression());
-
-// stripe webhook
-app.post("/webhook-checkout",express.raw({type: 'application/json'}), webhookCheckout)
-
-
-// use express.json() to parse json data from request body
-app.use(express.json());
-// use express.urlencoded() to parse urlencoded data from request body
-app.use(express.urlencoded({ extended: true }));
 
 // mount routes
 require('./routes/mountRoutes')(app);

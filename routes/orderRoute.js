@@ -2,12 +2,15 @@ const express = require('express');
 const router = express.Router();
 
 // require controllers
-const {createCashOrder, belongsToUser, filterOrdersForLoggedUser, getOrder, getOrders, updateOrderCancelStatus, updateOrderDeliverStatus, updateOrderPaidStatus, getCheckoutSession} = require('../controllers/orderController');
+const {createCashOrder, belongsToUser, filterOrdersForLoggedUser, getOrder, getOrders, updateOrderCancelStatus, updateOrderDeliverStatus, updateOrderPaidStatus, getCheckoutSession, webhookCheckout} = require('../controllers/orderController');
 
 // require auth controllers
 const {protect, restrictTo} = require('../controllers/authController');
 
 // routes
+
+// stripe webhook
+router.post("/webhook-checkout",express.raw({type: 'application/json'}), webhookCheckout)
 
 router.use(protect);
 router.get("/:id/checkout-session", restrictTo("user"), getCheckoutSession)
