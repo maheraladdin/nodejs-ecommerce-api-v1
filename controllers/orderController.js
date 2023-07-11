@@ -250,7 +250,7 @@ module.exports.getCheckoutSession = asyncHandler(async (req, res,next) => {
         customer_email: req.user.email,
         client_reference_id: cart._id,
         metadata: {
-            shippingAddress: userShippingAddress,
+            shippingAddress: JSON.stringify(userShippingAddress),
         },
     });
 
@@ -269,7 +269,7 @@ module.exports.getCheckoutSession = asyncHandler(async (req, res,next) => {
  * @desc    create an order for stripe session
  * @param   {Object} session - stripe session object
  * @param   {String} session.client_reference_id - cart id
- * @param   {Object} session.metadata.shippingAddress - shipping address object
+ * @param   {String} session.metadata.shippingAddress - shipping address stringified object
  * @param   {Number} session.amount_total - total price for cart
  * @param   {String} session.customer_email - user email address
  * @param   {Number} session.total_details.amount_tax - tax on cart
@@ -278,7 +278,7 @@ module.exports.getCheckoutSession = asyncHandler(async (req, res,next) => {
  */
 const createOrder = async (session) => {
     const cartId = session.client_reference_id;
-    const shippingAddress = session.metadata.shippingAddress;
+    const shippingAddress = JSON.parse(session.metadata.shippingAddress);
     const total = session.amount_total / 100;
     const email = session.customer_email;
     const {amount_tax: tax, amount_shipping: shipping} = session.total_details
@@ -314,7 +314,7 @@ const createOrder = async (session) => {
  * @desc    webhook handler for stripe checkout complete event
  * @param   {Object} req - request object
  * @param   {Object} res - response object
- * @return {Promise<void>}
+ * @return  {Promise<void>}
  */
 const webhookCheckoutHandler = async (req, res) => {
     const sig = req.headers['stripe-signature'];
@@ -332,7 +332,7 @@ const webhookCheckoutHandler = async (req, res) => {
 }
 
 // @desc    stripe webhook execute after completing checkout
-// @route   /api/v1/orders/webhook-checkout
+// @route   POST    /api/v1/orders/webhook-checkout
 module.exports.webhookCheckout = asyncHandler(webhookCheckoutHandler);
 
 
