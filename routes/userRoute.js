@@ -5,7 +5,7 @@ const express = require("express");
 const router = express.Router();
 
 // require utils validators
-const { getUserByIdValidator, createUserValidator, updateUserValidator, updateUserPasswordValidator, deleteUserValidator, updateUserRoleValidator, updateLoggedUserDataValidator } = require("../utils/ValidationLayer/Validators/UserValidators");
+const { getUserByIdValidator, createUserValidator, updateUserValidator, updateUserPasswordValidator, deleteUserValidator, updateUserRoleValidator, updateLoggedUserDataValidator } = require("../utils/ValidationLayer/Validators/userValidators");
 
 // require controllers
 const { getUsers, getUserById, createUser, updateUserById, deleteUserById, uploadUserProfileImg, optimizeUserProfileImg, updateUserPassword, updateUserRole, reactiveAccountById, reactiveLoggedUserAccount, updateLoggedUserPassword, updateLoggedUserData, deleteLoggedUserAccount } = require("../controllers/UserController");

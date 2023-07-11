@@ -18,7 +18,7 @@ const { createFilterObject, setBodyPropertyToParamsId } = require("../controller
 const { createSubCategoryValidator,
         getSubCategoryByIdValidator,
         updateSubCategoryValidator,
-        deleteSubCategoryByIdValidator } = require("../utils/ValidationLayer/Validators/SubCategoryValidators");
+        deleteSubCategoryByIdValidator } = require("../utils/ValidationLayer/Validators/subCategoryValidators");
 
 // require auth controllers
 const { protect, restrictTo } = require("../controllers/authController");
