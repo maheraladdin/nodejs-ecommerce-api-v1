@@ -5,6 +5,9 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const cors = require('cors');
 const compression = require('compression');
+const hpp = require('hpp');
+const expressMongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
 
 // require middlewares
 const errorHandler = require('./middlewares/errorHandlerMW');
@@ -43,7 +46,6 @@ app.use(compression());
 // make sure the data which sent is a json data
 app.use((req,res,next) => {
     if(req.body && req.get("Content-Type") && req.get("Content-Type").includes("application/json")) next(new RequestError("invalid content type",400));
-    console.log(req.get("Content-Type"))
     next();
 })
 
@@ -55,6 +57,20 @@ app.post("/webhook-checkout",express.raw({type: 'application/json'}), webhookChe
 app.use(express.json({
     limit: '20kb'
 }));
+
+// hpp middleware for preventing http parameter pollution by choosing the last parameter
+app.use(hpp({
+    whitelist: ["price","ratingsAverage", "ratingsQuantity","sold", "quantity"],
+}));
+
+// express-mongo-sanitize middleware for preventing nosql query injection
+app.use(expressMongoSanitize({allowDots: true}));
+
+// xss-clean middleware for preventing xss attacks
+app.use(xss());
+
+// xss-clean middleware for preventing xss attacks
+
 
 // mount routes
 require('./routes/mountRoutes')(app);

@@ -72,7 +72,7 @@ module.exports.createFilterObject = (propertyToFilterBy) =>
  * @param  {Model} Model - The model to get from
  * @return {object} - The response object
  */
-module.exports.getAll = (Model) => asyncHandler(async (req, res) => {
+module.exports.getAll = (Model ) => asyncHandler(async (req, res) => {
 
     console.log(req.filterObj);
     // filter object
