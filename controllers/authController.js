@@ -264,4 +264,47 @@ const resetPasswordHandler = async (req, res) => {
  * @route   Post /api/v1/auth/resetPassword
  * @access  Public
  */
-module.exports.resetPassword = asyncHandler(resetPasswordHandler); 
+module.exports.resetPassword = asyncHandler(resetPasswordHandler);
+
+/*
+ * @desc    this middleware used to generate csrf token
+ * @route   Get /api/v1/auth/createCsrfToken
+ * @access  protected
+ */
+module.exports.createCsrfToken = asyncHandler(async (req, res) => {
+    const path = req.route.path;
+    const data = crypto.randomBytes(36).toString('base64'); //Generates pseudorandom data. The size argument is a number indicating the number of bytes to generate.
+    if (path === "/createCsrfToken") {
+        req.session.csrfToken = data; // Assigns a token parameter to the session.
+    }
+    res.set('csrf-token', data); // Sets the token parameter in the response header.
+    res.status(200).json({
+        result: true, message: 'Token created successfully.',
+    });
+});
+
+/*
+ * @desc    this middleware used to check csrf token from the request header and session.
+ * STP: Synchronizer Token Pattern
+ */
+module.exports.checkCsrfTokenSTD = asyncHandler(async (req, res,next) => {
+    const sessionUserAuth = !!req.user;
+    const sessionCsrfToken = req.session.csrfToken;
+    const requestCsrfToken = req.get('CSRF-Token'); //The token sent within the request header.
+    if (!sessionUserAuth || !requestCsrfToken || !sessionCsrfToken) {
+        res.status(401)
+            .json({
+                result: false, message: 'Token has not been provided.'
+            });
+    }
+    if (requestCsrfToken !== sessionCsrfToken) {
+        res.status(401)
+            .json({
+                result: false, message: 'Invalid token.'
+            });
+    }
+    next();
+});
+
+
+

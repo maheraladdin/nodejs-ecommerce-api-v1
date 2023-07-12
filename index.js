@@ -28,6 +28,8 @@ process.env.NODE_ENV === "development" && app.use(morgan('dev')) && console.log(
 
 // use third party middlewares
 
+app.use(require("./config/sessionConfig"));
+
 // use helmet middleware for setting http headers for security
 app.use(require("helmet")());
 
