@@ -7,12 +7,15 @@ const {signup, login, forgetPassword, verifyPasswordResetToken, resetPassword} =
 // require auth validators
 const {signUpValidator, loginValidator, forgetPasswordValidator, resetPasswordValidator, verifyPasswordResetTokenValidator} = require('../utils/ValidationLayer/Validators/authValidators');
 
+// require limiter
+const limiter = require("../utils/rateLimit");
+
 // auth routes
-router.post('/signup', signUpValidator, signup);
-router.post('/login', loginValidator, login);
-router.post('/forgetPassword', forgetPasswordValidator, forgetPassword);
-router.post('/verifyPasswordResetToken', verifyPasswordResetTokenValidator, verifyPasswordResetToken);
-router.patch('/resetPassword', resetPasswordValidator, resetPassword);
+router.post('/signup', limiter, signUpValidator, signup);
+router.post('/login', limiter, loginValidator, login);
+router.post('/forgetPassword', limiter, forgetPasswordValidator, forgetPassword);
+router.post('/verifyPasswordResetToken', limiter, verifyPasswordResetTokenValidator, verifyPasswordResetToken);
+router.patch('/resetPassword', limiter, resetPasswordValidator, resetPassword);
 
 
 
