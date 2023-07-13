@@ -24,6 +24,7 @@ const app = express();
 
 // use middlewares
 
+
 // use morgan for logging requests in development mode
 process.env.NODE_ENV === "development" && app.use(morgan('dev')) && console.log('Morgan enabled for development');
 
@@ -69,12 +70,8 @@ app.use(expressMongoSanitize({allowDots: true}));
 // xss-clean middleware for preventing xss attacks
 app.use(xss());
 
-// xss-clean middleware for preventing xss attacks
-
-
 // mount routes
 require('./routes/mountRoutes')(app);
-
 
 // Error handler middleware for handling all unhandled routes
 app.all('*',(req,res,next) => {
