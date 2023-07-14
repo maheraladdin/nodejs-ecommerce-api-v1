@@ -363,8 +363,8 @@ const checkCsrfTokenHandler =  (req, res,next) => {
             });
     }
 
+    // Check if the token sent within the request header is the same as the token stored in the session for the same user.
     const sessionUserAuth = requestCsrfToken.includes(hashedUserId);
-
     if (!sessionUserAuth) {
         res.status(401)
             .json({
