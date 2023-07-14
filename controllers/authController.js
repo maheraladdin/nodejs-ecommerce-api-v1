@@ -355,14 +355,23 @@ module.exports.createCsrfToken = asyncHandler(createCsrfTokenHandler);
 const checkCsrfTokenHandler =  (req, res,next) => {
     const requestCsrfToken = req.get('CSRF-Token'); //The token sent within the request header.
     const hashedUserId = hash(req.user._id.toString());
-    const sessionUserAuth = requestCsrfToken.includes(hashedUserId);
     const sessionCsrfToken = req.session.csrfToken;
-    if (!sessionUserAuth || !requestCsrfToken || !sessionCsrfToken) {
+    if (!requestCsrfToken || !sessionCsrfToken) {
         res.status(401)
             .json({
                 result: false, message: 'Token has not been provided.'
             });
     }
+
+    const sessionUserAuth = requestCsrfToken.includes(hashedUserId);
+
+    if (!sessionUserAuth) {
+        res.status(401)
+            .json({
+                result: false, message: 'Invalid token.'
+            });
+    }
+
     if (requestCsrfToken !== sessionCsrfToken) {
         res.status(401)
             .json({
