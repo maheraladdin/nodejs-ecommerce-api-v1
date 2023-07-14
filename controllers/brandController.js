@@ -14,6 +14,7 @@ module.exports.getBrands = getAll(Brand);
  * @route   GET /api/v1/brands/:id
  * @desc    Get a brand by id
  * @access  Public
+ * @params  id - brand id
 */
 module.exports.getBrandById = getOne(Brand,'Brand');
 
@@ -34,6 +35,7 @@ module.exports.uploadBrandImage = upload.single("image");
  * @route   POST /api/v1/brands
  * @desc    Create a new brand
  * @access  Private (admin, manager)
+ * @body    name, image
 */
 module.exports.createBrand = createOne(Brand);
 
@@ -41,6 +43,8 @@ module.exports.createBrand = createOne(Brand);
  * @route   PUT /api/v1/brands/:id
  * @desc    Update a brand by id
  * @access  Private (admin, manager)
+ * @params  id - brand id
+ * @body    name, image
 */
 module.exports.updateBrandById = updateOne(Brand, "Brand");
 
@@ -48,5 +52,6 @@ module.exports.updateBrandById = updateOne(Brand, "Brand");
  * @route   DELETE /api/v1/brands/:id
  * @desc    Delete a brand by id
  * @access  Private (admin)
+ * @params  id - brand id
 */
 module.exports.deleteBrandById = deleteOne(Brand, "Brand");

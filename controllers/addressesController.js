@@ -1,19 +1,19 @@
-// Description: Handle User requests.
+// Description: Handle Addresses requests.
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 
 /**
  * @desc    Get user addresses
  * @param   {object} req - request object
- * @param   {object} req.user - user object
- * @param   {object} req.user.id - user id
+ * @param   {object} req.user - logged user object
+ * @param   {object} req.user.id - logged user id
  * @param   {object} res - response object
  */
 const getUserAddressesHandler = async (req, res) => {
     const {addresses} = await User.findById(req.user.id).populate('addresses');
     res.status(200).json({
         status: 'success',
-        message: 'User wishlist fetched successfully',
+        message: 'User addresses fetched successfully',
         length: addresses.length,
         addresses
     });
@@ -21,17 +21,17 @@ const getUserAddressesHandler = async (req, res) => {
 
 /*
  * @route   GET /api/v1/addresses
- * @desc    Get user wishlist
+ * @desc    Get logged user addresses
  * @access  Private (user)
  */
 module.exports.getUserAddresses = asyncHandler(getUserAddressesHandler);
 
 /**
- * @desc    add address to user addresses
+ * @desc    add address to logged user addresses
  * @param   {object} req - request object
  * @param   {object} req.body - request body
- * @param   {object} req.user - user object
- * @param   {object} req.user.id - user id
+ * @param   {object} req.user - logged user object
+ * @param   {object} req.user.id -logged user id
  * @param   {object} res - response object
  *
  */
@@ -39,15 +39,16 @@ const addAddressToUserAddressesHandler = async (req, res) => {
     const {addresses} = await User.findByIdAndUpdate(req.user.id, {$addToSet: {addresses: req.body}}, {new: true});
     res.status(200).json({
         status: 'success',
-        message: 'Address added to wishlist successfully',
+        message: 'Address added to addresses list successfully',
         addresses
     });
 }
 
 /*
- * @desc    add product to user wishlist
+ * @desc    add address to logged user addresses
  * @route   PATCH /api/v1/addresses
  * @access  Private (user)
+ * @body    alias, details, phone, city, postalCode
  */
 module.exports.addAddressToUserAddresses = asyncHandler(addAddressToUserAddressesHandler);
 
@@ -55,24 +56,25 @@ module.exports.addAddressToUserAddresses = asyncHandler(addAddressToUserAddresse
  * @desc    remove address from user addresses
  * @param   {object} req - request object
  * @param   {object} req.params - request params
- * @param   {object} req.params.product - product id
- * @param   {object} req.user - user object
- * @param   {object} req.user.id - user id
+ * @param   {object} req.params.address - address id
+ * @param   {object} req.user - logged user object
+ * @param   {object} req.user.id - logged user id
  * @param   {object} res - response object
  */
 const removeAddressFromUserAddressesHandler = async (req, res) => {
     const {addresses} = await User.findByIdAndUpdate(req.user.id, {$pull: {addresses: {_id: req.params.address}}}, {new: true});
     res.status(200).json({
-        message: 'Product removed from wishlist successfully',
         status: 'success',
+        message: 'Address removed from addresses list successfully',
         addresses
     });
 }
 
 /*
- * @desc    remove product from user wishlist
+ * @desc    remove address from user addresses
  * @route   DELETE /api/v1/addresses/:address
  * @access  Private (user)
+ * @params  address
  */
 module.exports.removeAddressFromUserAddresses = asyncHandler(removeAddressFromUserAddressesHandler);
 

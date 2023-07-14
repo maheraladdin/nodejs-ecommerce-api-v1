@@ -7,7 +7,7 @@ const Coupon = require('../models/couponModel');
 /**
  * @desc    Calculate total cart price for logged user
  * @param   {object} cart - cart object
- * @return {number}
+ * @return  {number}
  */
 const calculateCartPrice = (cart) =>
     Math.round(cart.items.reduce((acc, item) => acc + item.price * item.quantity, 0));
@@ -171,8 +171,8 @@ const updateItemQuantityHandler = async (req, res) => {
 //@desc     Update item quantity in cart
 //@route    PATCH /api/cart/:id
 //@access   Private (user)
-//@body     {number} quantity - item quantity
-//@param    {string} id - item id
+//@body     quantity - item quantity
+//@param    id - item id
 module.exports.updateItemQuantity = asyncHandler(updateItemQuantityHandler);
 
 /**
@@ -209,7 +209,7 @@ const applyCouponHandler = async (req, res) => {
         throw new RequestError("Coupon is already applied", 400);
 
     // If coupon is expired, or is used max number of times, throw error
-    if(couponFromDB.numberOfUsage === couponFromDB.maxNumberOfUsage)
+    if(couponFromDB.numberOfUsage >= couponFromDB.maxNumberOfUsage)
         throw new RequestError("Coupon is expired", 400);
 
     // Apply coupon to cart
@@ -239,7 +239,7 @@ const applyCouponHandler = async (req, res) => {
 //@desc     Apply coupon to cart
 //@route    PATCH /api/cart/applyCoupon
 //@access   Private (user)
-//@body     {string} name - coupon name
+//@body     name - coupon name
 module.exports.applyCoupon = asyncHandler(applyCouponHandler);
 
 /**
@@ -287,7 +287,7 @@ const deleteItemFromCartHandler = async (req, res) => {
 // @desc    Delete product from cart by item id
 // @route   DELETE /api/cart/:id
 // @access  Private (user)
-// @param   {string} id - item id
+// @param   id - item id
 module.exports.deleteItemFromCart = asyncHandler(deleteItemFromCartHandler);
 
 /**

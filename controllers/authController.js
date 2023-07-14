@@ -20,18 +20,24 @@ const sendEmail = require("../utils/sendEmail");
  * @desc    sign up user
  * @route   POST /api/v1/auth/signup
  * @access  public
+ * @body    name, email, password, passwordConfirmation
  */
 module.exports.signup = createOne(User,{generateToken: true});
 
-/*
- * @desc    login user
- * @route   POST /api/v1/auth/login
- * @access  public
+/**
+ * @desc    login user handler
+ * @param   {Object} req - request object
+ * @param   {Object} req.body - request body
+ * @param   {String} req.body.email - user email
+ * @param   {String} req.body.password - user password
+ * @param   {Object} res - response object
+ * @return {Promise<void>}
  */
-module.exports.login = asyncHandler(async (req, res) => {
+const loginHandler = async (req, res) => {
     const {email, password} = req.body;
     // check if email exists and password is correct
     const user = await User.findOne({email}).select("+password");
+    console.log(user);
     if (!user || !(bcrypt.compareSync(password, user.password))) throw new RequestError("Incorrect email or password", 401);
 
     // generate token
@@ -45,12 +51,28 @@ module.exports.login = asyncHandler(async (req, res) => {
             user
         }
     });
-});
+}
 
 /*
- * @desc    this middleware used to protect routes by making sure that the user is logged in before accessing the route
+ * @desc    login user
+ * @route   POST /api/v1/auth/login
+ * @access  public
+ * @body    email, password
  */
-module.exports.protect = asyncHandler(async (req, res, next) => {
+module.exports.login = asyncHandler(loginHandler);
+
+/**
+ * @desc    protect routes handler
+ * @param   {Object} req - request object
+ * @param   {Object} req.headers - request headers
+ * @param   {String} req.headers.authorization - request authorization header
+ * @param   {String} req.user - logged user object
+ * @param   {String} req.iat - logged user token creation date
+ * @param   {Object} res - response object
+ * @param   {Function} next - next middleware function
+ * @return  {Promise<void>}
+ */
+const protectHandler = async (req, res, next) => {
     // 1) get token from request header
     const {authorization} = req.headers;
     if (!authorization || !authorization.startsWith("Bearer ")) throw new RequestError("You are not logged in! Please log in to get access.", 401);
@@ -63,14 +85,9 @@ module.exports.protect = asyncHandler(async (req, res, next) => {
     const currentUser = await User.findById(decoded.id);
     if (!currentUser) throw new RequestError("The user belonging to this token does no longer exist.", 401);
 
-    /**
-     * @desc    get passwordChangedAt from db
-     * @type Date
-     * @constant
-     */
+    // 4) check if user changed password after the token was created
     const {passwordChangedAt} = currentUser;
 
-    // 4) check if user changed password after the token was created
     if(passwordChangedAt) {
         const {iat: JWTTimestamp} = decoded;
         const passwordChangedTimestamp = parseInt(passwordChangedAt.getTime() / 1000,10);
@@ -80,7 +97,41 @@ module.exports.protect = asyncHandler(async (req, res, next) => {
     req.user = currentUser;
     req.iat = decoded.iat;
     next();
-});
+}
+
+/*
+ *  @desc    this middleware used to protect routes by making sure that the user is logged in before accessing the route
+ *  @headers authorization - Bearer token
+ */
+module.exports.protect = asyncHandler(protectHandler);
+
+
+/**
+ * @desc    this middleware used to restrict routes by making sure that the user has the required role
+ * @param   {Object} req - request object
+ * @param   {Object} req.user - logged user object
+ * @param   {String} req.user.role - logged user role
+ * @param   {Date} req.user.roleChangedAt - logged user role changed date
+ * @param   {Object} res - response object
+ * @param   {Function} next - next middleware function
+ * @param   {String} roles - required roles
+ * @return  {void}
+ */
+const restrictToHandler = (req,res, next, ...roles) => {
+    const {roleChangedAt} = req.user;
+
+    // 1) check if user role changed after the token was created
+    if (roleChangedAt) {
+        const {iat: JWTTimestamp} = req;
+        const roleChangedTimestamp = parseInt(roleChangedAt.getTime() / 1000, 10);
+        if (JWTTimestamp < roleChangedTimestamp) throw new RequestError("role changed recently. please login again..", 401);
+    }
+
+    // 2) check if user role is included in roles array
+    if (!roles.includes(req.user.role)) throw new RequestError("You do not have permission to perform this action", 403);
+
+    next();
+}
 
 /**
  * @desc    this middleware used to restrict routes by making sure that the user has the required role
@@ -89,27 +140,7 @@ module.exports.protect = asyncHandler(async (req, res, next) => {
  * @type    Function
  */
 module.exports.restrictTo = (...roles) =>
-    asyncHandler((req, res, next) => {
-
-        /**
-         * @desc    get roleChangedAt from db
-         * @type Date
-         * @constant
-         */
-        const {roleChangedAt} = req.user;
-
-        // 1) check if user role changed after the token was created
-        if (roleChangedAt) {
-            const {iat: JWTTimestamp} = req;
-            const roleChangedTimestamp = parseInt(roleChangedAt.getTime() / 1000, 10);
-            if (JWTTimestamp < roleChangedTimestamp) throw new RequestError("role changed recently. please login again..", 401);
-        }
-
-        // 2) check if user role is included in roles array
-        if (!roles.includes(req.user.role)) throw new RequestError("You do not have permission to perform this action", 403);
-
-        next();
-    });
+    asyncHandler((req, res, next) => restrictToHandler(req, res, next, ...roles));
 
 /**
  * @desc    this middleware used to hash reset token
@@ -178,6 +209,7 @@ const forgetPasswordHandler = async (req, res) => {
  * @desc    this middleware used to ask for change password
  * @route   Post /api/v1/auth/forgetPassword
  * @access  Public
+ * @body    {string} email - user's email
  */
 module.exports.forgetPassword = asyncHandler(forgetPasswordHandler);
 
@@ -220,6 +252,7 @@ const verifyPasswordResetTokenHandler = async (req, res) => {
  * @desc    this middleware used to verify password reset token
  * @route   Post /api/v1/auth/verifyPasswordResetToken
  * @access  Public
+ * @body    {string} passwordResetToken - reset token
  */
 module.exports.verifyPasswordResetToken = asyncHandler(verifyPasswordResetTokenHandler);
 
@@ -231,7 +264,7 @@ module.exports.verifyPasswordResetToken = asyncHandler(verifyPasswordResetTokenH
  * @param   {string} req.body.email - user's email
  * @param   {string} req.body.password - user's password
  * @param   {object} res - response object
- * @return {Promise<void>}
+ * @return  {Promise<void>}
  */
 const resetPasswordHandler = async (req, res) => {
     // get user based on the email and check if token has verified
@@ -263,15 +296,20 @@ const resetPasswordHandler = async (req, res) => {
  * @desc    this middleware used to reset password
  * @route   Post /api/v1/auth/resetPassword
  * @access  Public
+ * @body    email, password, passwordConfirmation
  */
 module.exports.resetPassword = asyncHandler(resetPasswordHandler);
 
-/*
- * @desc    this middleware used to generate csrf token
- * @route   Get /api/v1/auth/createCsrfToken
- * @access  protected
+/**
+ * @desc    this middleware used to create csrf token and send it to the client in header
+ * @param   {object} req - request object
+ * @param   {object} req.route - request route
+ * @param   {string} req.route.path - request route path
+ * @param   {object} req.session - logged user session
+ * @param   {object} req.session.csrfToken - logged user csrf token
+ * @param   {object} res - response object
  */
-module.exports.createCsrfToken = asyncHandler(async (req, res) => {
+const createCsrfTokenHandler = (req, res) => {
     const path = req.route.path;
     const data = crypto.randomBytes(36).toString('base64'); //Generates pseudorandom data. The size argument is a number indicating the number of bytes to generate.
     if (path === "/createCsrfToken") {
@@ -281,13 +319,26 @@ module.exports.createCsrfToken = asyncHandler(async (req, res) => {
     res.status(200).json({
         result: true, message: 'Token created successfully.',
     });
-});
+}
 
 /*
- * @desc    this middleware used to check csrf token from the request header and session.
- * STP: Synchronizer Token Pattern
+ * @desc    this middleware used to generate csrf token
+ * @route   Get /api/v1/auth/createCsrfToken
+ * @access  protected
  */
-module.exports.checkCsrfTokenSTD = asyncHandler(async (req, res,next) => {
+module.exports.createCsrfToken = asyncHandler(createCsrfTokenHandler);
+
+/**
+ * @desc    this middleware used to check csrf token from the request header and session.
+ * @param   {object} req - request object
+ * @param   {object} req.user - logged user object
+ * @param   {object} req.session - logged user session
+ * @param   {object} req.session.csrfToken - logged user csrf token
+ * @param   {Function} req.get - Get request header by name
+ * @param   {Object} res - response object
+ * @param   {Function} next - next middleware
+ */
+const checkCsrfTokenHandler =  (req, res,next) => {
     const sessionUserAuth = !!req.user;
     const sessionCsrfToken = req.session.csrfToken;
     const requestCsrfToken = req.get('CSRF-Token'); //The token sent within the request header.
@@ -304,7 +355,14 @@ module.exports.checkCsrfTokenSTD = asyncHandler(async (req, res,next) => {
             });
     }
     next();
-});
+}
+
+/*
+ * @desc    this middleware used to check csrf token from the request header and session.
+ * @STP     Synchronizer Token Pattern
+ * @headers  CSRF-Token
+ */
+module.exports.checkCsrfTokenSTD = asyncHandler(checkCsrfTokenHandler);
 
 
 
