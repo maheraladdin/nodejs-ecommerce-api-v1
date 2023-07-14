@@ -301,6 +301,17 @@ const resetPasswordHandler = async (req, res) => {
 module.exports.resetPassword = asyncHandler(resetPasswordHandler);
 
 /**
+ * @desc    this middleware used to insert substring at index
+ * @param   {String} str - string to insert in
+ * @param   {String} substring - substring to insert
+ * @param   {Number} index - index to insert at
+ * @return  {String}
+ */
+function insertAtIndex(str, substring, index) {
+    return str.slice(0, index) + substring + str.slice(index);
+}
+
+/**
  * @desc    this middleware used to create csrf token and send it to the client in header
  * @param   {object} req - request object
  * @param   {object} req.route - request route
@@ -311,9 +322,12 @@ module.exports.resetPassword = asyncHandler(resetPasswordHandler);
  */
 const createCsrfTokenHandler = (req, res) => {
     const path = req.route.path;
-    const data = crypto.randomBytes(36).toString('base64'); //Generates pseudorandom data. The size argument is a number indicating the number of bytes to generate.
+    let data = crypto.randomBytes(36).toString('base64'); //Generates pseudorandom data. The size argument is a number indicating the number of bytes to generate.
+    const hashedUserId = hash(req.user._id.toString());
+    data = insertAtIndex(data, hashedUserId, data.length / 2);
     if (path === "/createCsrfToken") {
         req.session.csrfToken = data; // Assigns a token parameter to the session.
+        req.session.hashedUserId = hashedUserId;
     }
     res.set('csrf-token', data); // Sets the token parameter in the response header.
     res.status(200).json({
@@ -339,9 +353,10 @@ module.exports.createCsrfToken = asyncHandler(createCsrfTokenHandler);
  * @param   {Function} next - next middleware
  */
 const checkCsrfTokenHandler =  (req, res,next) => {
-    const sessionUserAuth = !!req.user;
-    const sessionCsrfToken = req.session.csrfToken;
     const requestCsrfToken = req.get('CSRF-Token'); //The token sent within the request header.
+    const hashedUserId = hash(req.user._id.toString());
+    const sessionUserAuth = requestCsrfToken.includes(hashedUserId);
+    const sessionCsrfToken = req.session.csrfToken;
     if (!sessionUserAuth || !requestCsrfToken || !sessionCsrfToken) {
         res.status(401)
             .json({
