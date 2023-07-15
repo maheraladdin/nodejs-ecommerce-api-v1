@@ -19,7 +19,9 @@ const fileFilter = (req, file, cb) => {
     cb(isImage ? null : fileTypeError, isImage);
 }
 
-/**
+/*
  * @desc    create multer instance
+ * @param   {object} storage - multer storage
+ * @param   {function} fileFilter - multer file filter
  */
 module.exports = multer({storage, fileFilter});

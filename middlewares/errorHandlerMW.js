@@ -5,7 +5,7 @@ const RequestError = require("../utils/requestError");
 
 /**
  * @desc: Error handler middleware
- * @param {object} err - error object {statusCode, status, message}
+ * @param {Error} err - error object {statusCode, status, message}
  * @param {number} err.statusCode - status code of error
  * @param {string} err.status - status of error
  * @param {object} req - request object
@@ -21,7 +21,7 @@ module.exports = (err, req, res, next) => {
 
 /**
  * @desc: This function is used to send error in development mode
- * @param {object} err - error object {statusCode, status, message}
+ * @param {Error} err - error object {statusCode, status, message}
  * @param {number} err.statusCode - status code of error
  * @param {string} err.status - status of error
  * @param {string} err.message - message of error
@@ -40,7 +40,7 @@ const sendErrorDev = (err, res) => {
 
 /**
  * @desc: This function is used to send error in production mode
- * @param {object} err - error object {statusCode, status, message}
+ * @param {Error} err - error object {statusCode, status, message}
  * @param {number} err.statusCode - status code of error
  * @param {string} err.status - status of error
  * @param {string} err.message - message of error
