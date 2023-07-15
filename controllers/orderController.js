@@ -28,11 +28,14 @@ const filterOrdersForLoggedUserHandler = async (req, res, next) => {
     next();
 }
 
+// @desc    middleware to filter orders for logged user based on his role
 module.exports.filterOrdersForLoggedUser = asyncHandler(filterOrdersForLoggedUserHandler);
 
-// @desc    Get all orders for logged user
-// @route   GET /api/v1/orders
-// @access  Protected
+/*
+ * @desc    Get all orders for logged user
+ * @route   GET /api/v1/orders
+ * @access  Protected
+ */
 module.exports.getOrders = getAll(Order);
 
 /**
@@ -54,12 +57,15 @@ const belongsToUserHandler = async (req, res, next) => {
     next();
 }
 
+// @desc    middleware to check if order belongs to logged user
 module.exports.belongsToUser = asyncHandler(belongsToUserHandler);
 
-// @desc    Get order by id
-// @route   GET /api/v1/orders/:id
-// @access  Protected
-// @params  {String} id - order id
+/*
+ * @desc    Get order by id
+ * @route   GET /api/v1/orders/:id
+ * @access  Protected
+ * @params  {String} id - order id
+ */
 module.exports.getOrder = getOne(Order, "Order");
 
 /**
@@ -156,11 +162,13 @@ const createCashOrderHandler = async (req, res, next) => {
     });
 }
 
-// @desc    Create new cash order
-// @route   POST /api/v1/orders/:id
-// @access  Private (user)
-// @params  id: cart id (cart to be ordered)
-// @body    shippingAddress: string (alias of user address)
+/*
+ * @desc    Create new cash order
+ * @route   POST /api/v1/orders/:id
+ * @access  Private (user)
+ * @params  id: cart id (cart to be ordered)
+ * @body    shippingAddress: string (alias of user address)
+ */
 module.exports.createCashOrder = asyncHandler(createCashOrderHandler);
 
 /**
@@ -180,32 +188,51 @@ const updateStatusHandler = (status) => async (req,res) => {
     });
 }
 
-// @desc    Update order pay status
-// @route   PATCH /api/v1/orders/:id/pay
-// @access  Private (admin, manager)
-// @body    isPaid: boolean
+/*
+ * @desc    Update order pay status
+ * @route   PATCH /api/v1/orders/:id/pay
+ * @access  Private (admin, manager)
+ * @body    isPaid: boolean
+ */
 module.exports.updateOrderPaidStatus = asyncHandler(updateStatusHandler("isPaid"));
 
-// @desc    Update order deliver status
-// @route   PATCH /api/v1/orders/:id/deliver
-// @access  Private (admin, manager)
-// @body    isDelivered: boolean
+/*
+ * @desc    Update order deliver status
+ * @route   PATCH /api/v1/orders/:id/deliver
+ * @access  Private (admin, manager)
+ * @body    isDelivered: boolean
+ */
 module.exports.updateOrderDeliverStatus = asyncHandler(updateStatusHandler("isDelivered"));
 
-// @desc    Update order cancel status
-// @route   PATCH /api/v1/orders/:id/cancel
-// @access  Protected
-// @body    isCancelled: boolean
+/*
+ * @desc    Update order cancel status
+ * @route   PATCH /api/v1/orders/:id/cancel
+ * @access  Protected
+ * @body    isCancelled: boolean
+ */
 module.exports.updateOrderCancelStatus = asyncHandler(updateStatusHandler("isCancelled"));
 
-// @desc    Get checkout session for stripe payment
-// @route   GET /api/v1/orders/:id/checkout-session
-// @access  Private (user)
-// @params  id: cart id (cart to be ordered)
-module.exports.getCheckoutSession = asyncHandler(async (req, res,next) => {
+/**
+ * @desc    create order with stripe payment method Handler
+ * @param   {Object} req - request object
+ * @param   {Object} req.body - request body
+ * @param   {String} req.body.shippingAddress - order shipping address alias
+ * @param   {String} req.params - request params
+ * @param   {String} req.params.id - cart id
+ * @param   {Object} req.user - logged user
+ * @param   {String} req.user._id - logged user id
+ * @param   {Object} req.user.addresses - logged user addresses
+ * @param   {String} req.protocol - request protocol
+ * @param   {Function} req.get - request get method (get header)
+ * @param   {Object} res - response object
+ * @param   {Function} next - next middleware
+ * @return {Promise<*>}
+ */
+const getCheckoutSessionHandler = async (req, res,next) => {
     // app settings
     const tax = 0;
     const shipping = 0;
+
     // Get cart by id
     const cart = await Cart.findById(req.params.id);
 
@@ -263,7 +290,16 @@ module.exports.getCheckoutSession = asyncHandler(async (req, res,next) => {
         session,
     })
 
-});
+}
+
+/*
+ * @desc    Get checkout session for stripe payment
+ * @route   GET /api/v1/orders/:id/checkout-session
+ * @access  Private (user)
+ * @params  id: cart id (cart to be ordered)
+ * @body    shippingAddress: string (alias of user address)
+ */
+module.exports.getCheckoutSession = asyncHandler(getCheckoutSessionHandler);
 
 /**
  * @desc    create an order for stripe session
@@ -314,12 +350,16 @@ const createOrder = async (session) => {
 /**
  * @desc    webhook handler for stripe checkout complete event
  * @param   {Object} req - request object
+ * @param   {Object} req.body - request body
+ * @param   {Object} req.headers - request headers
+ * @param   {String} req.headers['stripe-signature'] - stripe signature
  * @param   {Object} res - response object
  * @return  {Promise<void>}
  */
 const webhookCheckoutHandler = async (req, res) => {
     const sig = req.headers['stripe-signature'];
 
+    // Verify webhook signature and extract the event.
     const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET_KEY);
 
     // Handle the event
@@ -332,8 +372,10 @@ const webhookCheckoutHandler = async (req, res) => {
     });
 }
 
-// @desc    stripe webhook execute after completing checkout
-// @route   POST    /api/v1/orders/webhook-checkout
+/*
+ * @desc    stripe webhook execute after completing checkout
+ * @route   POST    /api/v1/orders/webhook-checkout
+ */
 module.exports.webhookCheckout = asyncHandler(webhookCheckoutHandler);
 
 

@@ -195,10 +195,15 @@ module.exports.createOne = (Model,options = {}) => asyncHandler(async (req, res)
     res.status(201).json(responseObject);
 });
 
-
 /**
  * @desc    Update a document by id
  * @access  Private
+ * @param   {object} req - The request object
+ * @param   {object} req.body - The request body
+ * @param   {string} req.params.id - The id of document
+ * @param   {string} req.user.id - The id of user
+ * @param   {object} res - The response object
+ * @param   {function} next - The next function
  * @param  {Model} Model - The model to update from
  * @param  {string} kind - The kind of document
  * @param  {object?} options - The options for update
@@ -211,17 +216,7 @@ module.exports.createOne = (Model,options = {}) => asyncHandler(async (req, res)
  * @param   {boolean?} options.generateToken - The flag to generate token
  * @param   {boolean?} options.message - The message to send in response
  */
-module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandler(
-    /**
-     * @desc    Update a document by id Handler
-     * @param   {object} req - The request object
-     * @param   {object} req.body - The request body
-     * @param   {string} req.params.id - The id of document
-     * @param   {string} req.user.id - The id of user
-     * @param   {object} res - The response object
-     * @return  {Promise<*>}
-     */
-    async (req, res) => {
+const updateOneHandler = async (req,res,next,Model,kind,options) => {
 
     // get id from params
     const id = req.params.id || req.user.id;
@@ -320,7 +315,27 @@ module.exports.updateOne = (Model,kind = "Document",options = {}) => asyncHandle
     response.document = document;
     // send response
     res.status(200).json(response);
-});
+
+}
+
+
+/**
+ * @desc    Update a document by id
+ * @access  Private
+ * @param  {Model} Model - The model to update from
+ * @param  {string} kind - The kind of document
+ * @param  {object?} options - The options for update
+ * @param  {string[]?} options.deleteFromRequestBody - The fields to delete from request body
+ * @param  {string[]?} options.selectFromRequestBody - The fields to select from request body
+ * @param  {boolean?} options.hashPassword - The flag to hash password
+ * @param  {boolean?} options.reActive - The flag to re-active document
+ * @param  {boolean?} options.deActive - The flag to de-active document
+ * @param   {boolean?} options.roleChanged - The flag to change role
+ * @param   {boolean?} options.generateToken - The flag to generate token
+ * @param   {boolean?} options.message - The message to send in response
+ */
+module.exports.updateOne = (Model,kind = "Document",options = {}) =>
+    asyncHandler(async (req, res,next) => updateOneHandler(req,res,next,Model,kind,options));
 
 /**
     @desc    Delete a category by id
