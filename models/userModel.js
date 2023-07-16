@@ -1,11 +1,39 @@
-// Description: User model based on mongoose schema
-// Require third-party modules
+// Purpose: User model for the database
+
+// Require mongoose
 const mongoose = require('mongoose');
+
+// Require bcrypt
 const bcrypt = require('bcrypt');
 
 // Constants
 const defaultProfileImg = "https://fakeimg.pl/600x400?text=profile+photo";
 
+/**
+ * @desc    create user schema using mongoose schema
+ * @param   {object} userSchema - user schema object
+ * @param   {string} userSchema.name - username
+ * @param   {string} userSchema.slug - user slug
+ * @param   {string} userSchema.email - user email
+ * @param   {string} userSchema.phone - user phone
+ * @param   {string} userSchema.profileImg - user profile image
+ * @param   {string} userSchema.password - user password
+ * @param   {date} userSchema.passwordChangedAt - user password changed at
+ * @param   {string} userSchema.passwordResetToken - user password reset token
+ * @param   {date} userSchema.passwordResetTokenExpire - user password reset token expire
+ * @param   {boolean} userSchema.passwordResetTokenVerification - user password reset token verification
+ * @param   {String} userSchema.role - user role
+ * @param   {object} userSchema.roleChangedAt - user role changed at
+ * @param   {object} userSchema.active - user active
+ * @param   {object} userSchema.addresses - user addresses
+ * @param   {object} userSchema.addresses.alias - user addresses alias
+ * @param   {object} userSchema.addresses.details - user addresses details
+ * @param   {object} userSchema.addresses.phone - user addresses phone
+ * @param   {object} userSchema.addresses.city - user addresses city
+ * @param   {object} userSchema.addresses.postalCode - user addresses postal code
+ * @param   {object} userSchema.wishlist - user wishlist
+ * @param   {object} userSchema.timestamps - user timestamps
+ */
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -108,6 +136,10 @@ const passwordHash = function (next) {
 
 userSchema.pre("save", passwordHash);
 
-
+/*
+ * @desc: create a model using user schema
+ * @param {string} modelName - model name
+ * @param {object} userSchema - user schema
+ */
 module.exports = mongoose.model('User', userSchema);
 

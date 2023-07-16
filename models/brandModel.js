@@ -1,7 +1,12 @@
 const mongoose = require('mongoose');
 
 /**
- * @desc    brand schema
+ * @desc    create brand schema using mongoose schema
+ * @param   {object} brandSchema - brand schema object
+ * @param   {string} brandSchema.name - brand name
+ * @param   {string} brandSchema.slug - brand slug
+ * @param   {string} brandSchema.image - brand image
+ * @param   {object} brandSchema.timestamps - brand timestamps
  */
 const brandSchema = new mongoose.Schema({
     name: {
@@ -33,7 +38,9 @@ const setInitiateBase64 = function (doc) {
 
 brandSchema.post(/(init|save)/, setInitiateBase64);
 
-/**
+/*
  * @desc    create model from schema
+ * @param   {string} modelName - model name
+ * @param   {object} brandSchema - brand schema
  */
 module.exports = mongoose.model('brands', brandSchema);

@@ -1,6 +1,16 @@
+// Purpose: To define the sub category model for the database
 
+// require mongoose
 const mongoose = require('mongoose');
 
+/**
+ * @desc   create sub category schema using mongoose schema
+ * @param  {object} subCategorySchema - sub category schema object
+ * @param  {string} subCategorySchema.name - sub category name
+ * @param  {string} subCategorySchema.slug - sub category slug
+ * @param  {object} subCategorySchema.category - sub category belongs to category
+ * @param  {object} subCategorySchema.timestamps - sub category timestamps
+ */
 const subCategorySchema = new mongoose.Schema({
     name: {
         type: String,
@@ -23,4 +33,10 @@ const subCategorySchema = new mongoose.Schema({
     timestamps: true
 });
 
+
+/*
+ * @desc    create model from schema
+ * @param   {string} subCategories - model name
+ * @param   {object} subCategorySchema - sub category schema
+ */
 module.exports = mongoose.model('subCategories', subCategorySchema);

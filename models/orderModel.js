@@ -1,6 +1,38 @@
+// Purpose: coupon model schema
 
+// require mongoose
 const mongoose = require('mongoose');
 
+/**
+ * @desc   create order schema using mongoose schema
+ * @param  {object} orderSchema - order schema object
+ * @param  {object} orderSchema.user - order user
+ * @param  {object} orderSchema.items - order items
+ * @param  {object} orderSchema.items.product - order item product
+ * @param  {string} orderSchema.items.product.name - order item product name
+ * @param  {string} orderSchema.items.product.slug - order item product slug
+ * @param  {string} orderSchema.items.product.image - order item product image
+ * @param  {number} orderSchema.items.quantity - order item quantity
+ * @param  {number} orderSchema.items.price - order item price
+ * @param  {string} orderSchema.items.color - order item color
+ * @param  {number} orderSchema.tax - order tax
+ * @param  {number} orderSchema.shipping - order shipping
+ * @param  {number} orderSchema.total - order total
+ * @param  {string} orderSchema.paymentMethod - order payment method
+ * @param  {boolean} orderSchema.isPaid - order is paid
+ * @param  {date} orderSchema.paidAt - order paid at
+ * @param  {boolean} orderSchema.isDelivered - order is delivered
+ * @param  {date} orderSchema.deliveredAt - order delivered at
+ * @param  {object} orderSchema.shippingAddress - order shipping address
+ * @param  {string} orderSchema.shippingAddress.alias - order shipping address alias
+ * @param  {string} orderSchema.shippingAddress.details - order shipping address details
+ * @param  {string} orderSchema.shippingAddress.phone - order shipping address phone
+ * @param  {string} orderSchema.shippingAddress.city - order shipping address city
+ * @param  {string} orderSchema.shippingAddress.postalCode - order shipping address postal code
+ * @param  {boolean} orderSchema.isCancelled - order is cancelled
+ * @param  {date} orderSchema.cancelledAt - order cancelled at
+ * @param  {object} orderSchema.timestamps - order timestamps
+ */
 const orderSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.ObjectId,
@@ -57,11 +89,22 @@ const orderSchema = new mongoose.Schema({
     cancelledAt: Date,
 },{timestamps: true});
 
-orderSchema.pre(/^find/, function (next) {
+/**
+ * @desc    Mongoose pre middleware to populate user and product
+ * @param   {function} next - next middleware
+ */
+const populateUserAndProductHandler = function (next) {
     this
         .populate({path: 'user', select: 'name email phone profileImg'})
         .populate({path: 'items.product', select: 'title imageCover'});
     next();
-});
+}
 
+orderSchema.pre(/^find/, populateUserAndProductHandler);
+
+/*
+ * @desc    create model from schema
+ * @param   {string} modelName - model name
+ * @param   {object} orderSchema - order schema
+ */
 module.exports = mongoose.model('orders', orderSchema);

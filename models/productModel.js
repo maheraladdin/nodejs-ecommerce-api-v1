@@ -1,6 +1,28 @@
+// Purpose: product model to create product schema and model
+
 // require mongoose
 const mongoose = require('mongoose');
-// create Schema
+
+/**
+ * @desc   create product schema using mongoose schema
+ * @param  {object} productSchema - product schema object
+ * @param  {string} productSchema.title - product title
+ * @param  {string} productSchema.slug - product slug
+ * @param  {string} productSchema.description - product description
+ * @param  {number} productSchema.quantity - product quantity
+ * @param  {number} productSchema.sold - product sold
+ * @param  {number} productSchema.price - product price
+ * @param  {number} productSchema.discountedPrice - product discounted price
+ * @param  {String[]} productSchema.color - product color
+ * @param  {String[]} productSchema.images - product images
+ * @param  {String} productSchema.imageCover - product image cover
+ * @param  {object} productSchema.category - product category
+ * @param  {object} productSchema.subCategory - product sub category
+ * @param  {object} productSchema.brand - product brand
+ * @param  {number} productSchema.ratingsAverage - product ratings average
+ * @param  {number} productSchema.ratingsQuantity - product ratings quantity
+ * @param  {object} productSchema.timestamps - product timestamps
+ */
 const productSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -113,5 +135,9 @@ const setInitiateBase64 = function (doc) {
 
 productSchema.post(/(init|save)/, setInitiateBase64);
 
-// create model
+/*
+ * @desc    create product model using mongoose model
+ * @param   {string} products - product model in db
+ * @param   {object} productSchema - product schema
+ */
 module.exports = mongoose.model("products", productSchema);

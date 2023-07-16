@@ -1,7 +1,15 @@
+// Purpose: category model schema
+
+// require mongoose
 const mongoose = require('mongoose');
 
 /**
- * @desc    category schema
+ * @desc   create category schema using mongoose schema
+ * @param  {object} categorySchema - category schema object
+ * @param  {string} categorySchema.name - category name
+ * @param  {string} categorySchema.slug - category slug
+ * @param  {string} categorySchema.image - category image
+ * @param  {object} categorySchema.timestamps - category timestamps
  */
 const categorySchema = new mongoose.Schema({
     name: {
@@ -34,7 +42,9 @@ const setInitiateBase64 = function (doc) {
 
 categorySchema.post(/(init|save)/, setInitiateBase64);
 
-/**
+/*
  * @desc    create model from schema
+ * @param   {string} modelName - model name
+ * @param   {object} categorySchema - category schema
  */
 module.exports = mongoose.model('categories', categorySchema);
