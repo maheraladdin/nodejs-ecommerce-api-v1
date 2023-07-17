@@ -110,6 +110,7 @@ const createCashOrderHandler = async (req, res, next) => {
     // app settings
     const tax = 0;
     const shipping = 0;
+
     // Get cart by id
     const cart = await Cart.findById(req.params.id);
 
@@ -183,7 +184,7 @@ const updateStatusHandler = (status) => async (req,res) => {
     if(!order) return next(new RequestError("Order not found", 404));
     res.status(200).json({
         status: "success",
-        message: "Order paid status updated successfully",
+        message: `Order ${status.slice(2).toLowerCase()} status updated successfully`,
         order,
     });
 }
@@ -193,6 +194,7 @@ const updateStatusHandler = (status) => async (req,res) => {
  * @route   PATCH /api/v1/orders/:id/pay
  * @access  Private (admin, manager)
  * @body    isPaid: boolean
+ * @params  id: order id
  */
 module.exports.updateOrderPaidStatus = asyncHandler(updateStatusHandler("isPaid"));
 
@@ -201,6 +203,7 @@ module.exports.updateOrderPaidStatus = asyncHandler(updateStatusHandler("isPaid"
  * @route   PATCH /api/v1/orders/:id/deliver
  * @access  Private (admin, manager)
  * @body    isDelivered: boolean
+ * @params  id: order id
  */
 module.exports.updateOrderDeliverStatus = asyncHandler(updateStatusHandler("isDelivered"));
 
@@ -209,6 +212,7 @@ module.exports.updateOrderDeliverStatus = asyncHandler(updateStatusHandler("isDe
  * @route   PATCH /api/v1/orders/:id/cancel
  * @access  Protected
  * @body    isCancelled: boolean
+ * @params  id: order id
  */
 module.exports.updateOrderCancelStatus = asyncHandler(updateStatusHandler("isCancelled"));
 
