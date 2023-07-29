@@ -44,12 +44,6 @@ app.options("*", cors());
 // compress all responses
 app.use(compression());
 
-// make sure the data which sent is a json data
-app.use((req,res,next) => {
-    if(req.body && req.get("Content-Type") && req.get("Content-Type").includes("application/json")) next(new RequestError("invalid content type",400));
-    next();
-})
-
 // stripe webhook
 const {webhookCheckout} = require("./controllers/orderController");
 app.post("/webhook-checkout",express.raw({type: 'application/json'}), webhookCheckout)
