@@ -160,8 +160,8 @@ const setSlug = (req) => {
  * @param   {boolean?} options.getUserByToken - The flag to get user by token
  * @return  {(function(*, *, *): Promise<void>)|*}
  */
-module.exports.setBodyPropertyToParamsId = (propertyToSet,options) => async (req,res,next) => {
-    const paramsToGet = options.paramsToGet || "id";
+module.exports.setBodyPropertyToParamsId = (propertyToSet,options = {}) => async (req,res,next) => {
+    const paramsToGet = (options && options.paramsToGet) || "id";
     if(!req.body[propertyToSet]) req.body[propertyToSet] = req.params[paramsToGet];
     if(!req.body.user && options.getUserByToken) req.body.user = req.user.id;
     next();
