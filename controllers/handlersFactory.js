@@ -97,7 +97,8 @@ module.exports.getAll = (Model ) => asyncHandler(async (req, res) => {
     // Send response
     res.status(200).json({
         status: 'success',
-        length: countDocuments,
+        length: documents.length,
+        numberOfDocuments: countDocuments,
         paginationResult,
         documents
     });
