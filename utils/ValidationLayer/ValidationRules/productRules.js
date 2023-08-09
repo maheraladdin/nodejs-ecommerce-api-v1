@@ -109,8 +109,6 @@ const images = "images";
  */
 module.exports.ProductImagesRule = check(images)
     .optional()
-    .isArray()
-    .withMessage(`Product ${images} must be an array`)
     .customSanitizer(notRedundant);
 
 /**
