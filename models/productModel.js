@@ -120,6 +120,20 @@ const populateCategories = function (next) {
 productSchema.pre(/^find/, populateCategories);
 
 /**
+ * @desc    mongoose pre middleware to populate brand
+ * @param   {Function} next - next middleware
+ */
+const populateBrand = function (next) {
+    this.populate({
+        path: "brand",
+        select: "name -_id",
+    });
+    next();
+}
+
+productSchema.pre(/^find/, populateBrand);
+
+/**
  * @desc    mongoose post middleware to add initiate base64 to imageCover and images
  * @param   {Object} doc - document object
  * @param   {string} doc.imageCover - imageCover url
