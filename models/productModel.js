@@ -112,7 +112,7 @@ productSchema.virtual("reviews", {
 const populateCategories = function (next) {
     this.populate({
         path: "category",
-        select: "name -_id",
+        select: "name _id",
     });
     next();
 }
@@ -126,7 +126,7 @@ productSchema.pre(/^find/, populateCategories);
 const populateBrand = function (next) {
     this.populate({
         path: "brand",
-        select: "name -_id",
+        select: "name _id",
     });
     next();
 }
