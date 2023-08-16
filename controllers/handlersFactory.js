@@ -77,16 +77,18 @@ module.exports.getAll = (Model ) => asyncHandler(async (req, res) => {
     // filter object
     const filter = req.filterObj ? req.filterObj : {};
 
-    // number of documents in collection
-    const countDocuments = await Model.countDocuments();
-
     // Create ApiFeatures instance
     const ApiFeaturesInstance = new ApiFeatures(Model.find(filter), req.query)
-        .pagination(countDocuments)
         .filterByField()
         .searchWithKeyword()
         .sortingByFields()
         .selectFields();
+
+    // number of docs after filtering
+    const countDocuments = await Model.countDocuments(ApiFeaturesInstance.mongooseQuery);
+
+    // apply pagination after sort and Filter
+    ApiFeaturesInstance.pagination(countDocuments)
 
     // destructuring mongooseQuery and paginationResult from ApiFeaturesInstance
     const { paginationResult, mongooseQuery } = ApiFeaturesInstance;
