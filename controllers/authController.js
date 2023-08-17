@@ -41,7 +41,7 @@ const loginHandler = async (req, res) => {
     if (!user || !(bcrypt.compareSync(password, user.password))) throw new RequestError("Incorrect email or password", 401);
 
     // generate token
-    const token = generateToken({id: user._id});
+    const token = generateToken({id: user._id}, req.headers["remember-me"]);
 
     // send token
     res.status(200).json({

@@ -13,9 +13,11 @@ const jwt = require("jsonwebtoken");
 
 /**
  * @desc    generate token
- * @param   {Object} payload
+ * @param   {Object} payload - The payload to sign
+ * @param   {boolean?} rememberMe - The remember me option
  */
-module.exports.generateToken = (payload) => {
+module.exports.generateToken = (payload,rememberMe) => {
+    if(rememberMe) return jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRES_IN_REMEMBER_ME});
     return jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRES_IN});
 }
 
@@ -192,7 +194,7 @@ module.exports.createOne = (Model,options = {}) => asyncHandler(async (req, res)
     // create document
     responseObject.document = await Model.create(req.body);
 
-    responseObject.token = options.generateToken && module.exports.generateToken({id: responseObject.document._id});
+    responseObject.token = options.generateToken && module.exports.generateToken({id: responseObject.document._id}, req.headers["remember-me"]);
 
     // send response
     res.status(201).json(responseObject);
@@ -231,7 +233,7 @@ const updateOneHandler = async (req,res,next,Model,kind,options) => {
     };
 
     // generate token if options.generateToken is true and send it in response
-    if(options.generateToken) response.token = module.exports.generateToken({id});
+    if(options.generateToken) response.token = module.exports.generateToken({id}, req.headers["remember-me"]);
 
     // delete fields from request body if exists in options.deleteFromRequestBody
     if(options.deleteFromRequestBody) {
