@@ -17,7 +17,7 @@ const jwt = require("jsonwebtoken");
  * @param   {boolean?} rememberMe - The remember me option
  */
 module.exports.generateToken = (payload,rememberMe) => {
-    if(rememberMe) return jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRES_IN_REMEMBER_ME});
+    if(rememberMe) return jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRES_REMEMBER_ME_IN});
     return jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRES_IN});
 }
 
