@@ -367,14 +367,14 @@ const checkCsrfTokenHandler =  (req, res,next) => {
     if (!sessionUserAuth) {
         res.status(401)
             .json({
-                result: false, message: 'Invalid token.'
+                result: false, message: 'Invalid csrf token.'
             });
     }
 
     if (requestCsrfToken !== sessionCsrfToken) {
         res.status(401)
             .json({
-                result: false, message: 'Invalid token.'
+                result: false, message: 'Invalid csrf token.'
             });
     }
     next();
