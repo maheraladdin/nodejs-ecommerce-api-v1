@@ -329,9 +329,8 @@ const createCsrfTokenHandler = (req, res) => {
         req.session.csrfToken = data; // Assigns a token parameter to the session.
         req.session.hashedUserId = hashedUserId;
     }
-    res.set('csrf-token', data); // Sets the token parameter in the response header.
     res.status(200).json({
-        result: true, message: 'Token created successfully.',
+        result: true, message: 'Token created successfully.',csrfToken: data,
     });
 }
 
