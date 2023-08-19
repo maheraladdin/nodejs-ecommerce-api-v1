@@ -11,10 +11,10 @@ const { getUserByIdValidator, createUserValidator, updateUserValidator, updateUs
 const { getUsers, getUserById, createUser, updateUserById, deleteUserById, uploadUserProfileImg, optimizeUserProfileImg, updateUserPassword, updateUserRole, reactiveAccountById, reactiveLoggedUserAccount, updateLoggedUserPassword, updateLoggedUserData, deleteLoggedUserAccount } = require("../controllers/userController");
 
 // require auth controllers
-const { protect, restrictTo, checkCsrfTokenSTD } = require("../controllers/authController");
+const { protect, restrictTo } = require("../controllers/authController");
 
 // protected routes
-router.use(protect, checkCsrfTokenSTD);
+router.use(protect);
 router.get("/loggedUser", getUserById);
 router.patch("/changeLoggedUserPassword", updateUserPasswordValidator, updateLoggedUserPassword);
 router.patch("/reactiveLoggedUserAccount", reactiveLoggedUserAccount);

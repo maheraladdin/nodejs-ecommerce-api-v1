@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 // require auth controllers
-const {signup, login, forgetPassword, verifyPasswordResetToken, resetPassword, createCsrfToken, protect} = require('../controllers/authController');
+const {signup, login, forgetPassword, verifyPasswordResetToken, resetPassword} = require('../controllers/authController');
 
 // require auth validators
 const {signUpValidator, loginValidator, forgetPasswordValidator, resetPasswordValidator, verifyPasswordResetTokenValidator} = require('../utils/ValidationLayer/Validators/authValidators');
@@ -23,8 +23,6 @@ router.post('/login', loginLimiter, loginValidator, login);
 router.post('/forgetPassword', forgetPasswordLimiter, forgetPasswordValidator, forgetPassword);
 router.post('/verifyPasswordResetToken', verifyPasswordResetTokenLimiter, verifyPasswordResetTokenValidator, verifyPasswordResetToken);
 router.patch('/resetPassword', resetPasswordLimiter, resetPasswordValidator, resetPassword);
-router.post("/createCsrfToken",protect , createCsrfToken);
-
 
 
 
