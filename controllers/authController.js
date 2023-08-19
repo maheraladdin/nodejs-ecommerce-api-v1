@@ -352,7 +352,7 @@ module.exports.createCsrfToken = asyncHandler(createCsrfTokenHandler);
  * @param   {Function} next - next middleware
  */
 const checkCsrfTokenHandler =  (req, res,next) => {
-    const requestCsrfToken = req.get('csrf-token'); //The token sent within the request header.
+    const requestCsrfToken = req.get('Csrf'); //The token sent within the request header.
     const hashedUserId = hash(req.user._id.toString());
     const sessionCsrfToken = req.session.csrfToken;
     if (!requestCsrfToken || !sessionCsrfToken) {
