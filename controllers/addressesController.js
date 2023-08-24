@@ -75,13 +75,22 @@ const addAddressToUserAddressesHandler = async (req, res) => {
  */
 module.exports.addAddressToUserAddresses = asyncHandler(addAddressToUserAddressesHandler);
 
+/**
+ * @desc    update address in user addresses
+ * @param   {object} req - request object
+ * @param   {object} req.params - request params
+ * @param   {object} req.params.address - address id
+ * @param   {object} req.body - request body
+ * @param   {object} req.user - logged user object
+ * @param   {string} req.user.id - logged user id
+ * @param   {object} res - response object
+ * @return  {Promise<void>}
+ */
 const updateAddressInUserAddressesHandler = async (req, res) => {
     const {addresses} = await User.findById(req.user.id).populate('addresses');
-    const newAddresses = addresses.map(address => {
-        if(address._id.toString() === req.params.address) {
-            return {...address.doc, ...req.body};
-        }
-    });
+    const selectedAddress = addresses.findIndex(address => address._id.toString() === req.params.address);
+    const newAddresses = [...addresses];
+    newAddresses[selectedAddress] = {...newAddresses[selectedAddress]._doc, ...req.body};
     await User.findByIdAndUpdate(req.user.id, {addresses: newAddresses}, {new: true});
     res.status(200).json({
         status: 'success',
