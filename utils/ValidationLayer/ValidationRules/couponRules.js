@@ -18,19 +18,7 @@ const isCouponIdExist = async (value) => {
 module.exports.CouponIdRule = idRule("Coupon")
     .custom(isCouponIdExist)
 
-/**
- * @desc: Rule checks if coupon name is unique
- * @param {string} value - coupon name
- * @return {Promise<boolean>}
- */
-const isCouponNameUnique = async (value) => {
-    // check if coupon name is unique
-    const coupon = await Coupon.exists({name: value});
-    if (coupon) {
-        throw new Error("Coupon name must be unique");
-    }
-    return true;
-}
+
 
 /*
  * @desc: Rule checks if coupon name is provided, transforms it to lowercase, and unique
@@ -39,8 +27,7 @@ module.exports.CouponNameRule = check("name")
     .trim()
     .notEmpty()
     .withMessage("Coupon name is required")
-    .toLowerCase()
-    .custom(isCouponNameUnique);
+    .toLowerCase();
 
 /**
  * @desc:   Rule checks if coupon expire date is valid (in the future)
