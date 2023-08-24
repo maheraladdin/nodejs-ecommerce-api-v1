@@ -51,6 +51,18 @@ module.exports.AddressAliasRule = check("alias")
     .custom(isAliasUniqueHandler);
 
 /*
+ * @desc: optional Rule checks if alias is valid
+ */
+module.exports.OptionalAddressAliasRule = check("alias")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage("Alias is required")
+    .isLength({min: 3, max: 20})
+    .withMessage("Alias must be between 3 and 20 characters")
+    .custom(isAliasUniqueHandler);
+
+/*
  * @desc: Rule checks if phone number is valid (egypt, saudi)
  */
 module.exports.AddressPhoneRule = check("phone")

@@ -5,10 +5,10 @@ const express = require("express");
 const router = express.Router();
 
 // require utils validators
-const { addAddressToAddressesValidator, removeAddressFromAddressesValidator } = require("../utils/ValidationLayer/Validators/addressesValidators");
+const { addAddressToAddressesValidator, removeAddressFromAddressesValidator, getUserAddressByIdValidator, updateAddressInAddressesValidator } = require("../utils/ValidationLayer/Validators/addressesValidators");
 
 // require controllers
-const { addAddressToUserAddresses, getUserAddresses, removeAddressFromUserAddresses } = require("../controllers/addressesController");
+const { addAddressToUserAddresses, getUserAddresses, removeAddressFromUserAddresses, getUserAddressById, updateAddressInUserAddresses } = require("../controllers/addressesController");
 
 // require auth controllers
 const { protect, restrictTo } = require("../controllers/authController");
@@ -20,6 +20,9 @@ router.route("/")
     .get(getUserAddresses)
     .post(addAddressToAddressesValidator, addAddressToUserAddresses);
 
-router.delete("/:address", removeAddressFromAddressesValidator, removeAddressFromUserAddresses);
+router.route("/:address")
+    .get(getUserAddressByIdValidator, getUserAddressById)
+    .put(updateAddressInAddressesValidator, updateAddressInUserAddresses)
+    .delete(removeAddressFromAddressesValidator, removeAddressFromUserAddresses);
 
 module.exports = router;
