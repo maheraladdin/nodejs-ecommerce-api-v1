@@ -79,7 +79,7 @@ const updateAddressInUserAddressesHandler = async (req, res) => {
     const {addresses} = await User.findById(req.user.id).populate('addresses');
     const newAddresses = addresses.map(address => {
         if(address._id.toString() === req.params.address) {
-            return {...address, ...req.body};
+            return {...address.doc, ...req.body};
         }
     });
     await User.findByIdAndUpdate(req.user.id, {addresses: newAddresses}, {new: true});
