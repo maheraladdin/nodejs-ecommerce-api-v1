@@ -21,7 +21,7 @@ module.exports.CouponIdRule = idRule("Coupon")
 
 
 /*
- * @desc: Rule checks if coupon name is provided, transforms it to lowercase, and unique
+ * @desc: Rule checks if coupon name is provided, transforms it to lowercase
  */
 module.exports.CouponNameRule = check("name")
     .trim()
