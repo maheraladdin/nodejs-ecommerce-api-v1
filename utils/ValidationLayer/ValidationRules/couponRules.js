@@ -72,8 +72,7 @@ module.exports.optionalCouponNameRule = check("name")
     .trim()
     .notEmpty()
     .withMessage("Coupon name is required")
-    .toLowerCase()
-    .custom(isCouponNameUnique);
+    .toLowerCase();
 
 /*
  * @desc: Rule checks optionally if coupon name is provided, transforms it to lowercase, and unique
