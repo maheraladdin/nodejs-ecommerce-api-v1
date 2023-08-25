@@ -44,6 +44,15 @@ const cartSchema = new mongoose.Schema({
     },
 }, { timestamps: true });
 
+const populateProduct = function (next) {
+    this.populate({
+        path: "items.product",
+    });
+    next();
+}
+
+cartSchema.pre(/^find/, populateProduct);
+
 /*
  * @desc    create model from schema
  * @param   {string} modelName - model name
