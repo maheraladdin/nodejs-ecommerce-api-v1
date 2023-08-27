@@ -96,7 +96,7 @@ const orderSchema = new mongoose.Schema({
 const populateUserAndProductHandler = function (next) {
     this
         .populate({path: 'user', select: 'name email phone profileImg'})
-        .populate({path: 'items.product', select: 'title imageCover'});
+        .populate({path: 'items.product'});
     next();
 }
 
