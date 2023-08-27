@@ -178,9 +178,19 @@ module.exports.createCashOrder = asyncHandler(createCashOrderHandler);
  * @return  {(function(*, *): Promise<*|undefined>)|*}
  */
 const updateStatusHandler = (status) => async (req,res) => {
-    const statusValue = req.body[status] || true;
+    const statusValue = req.body[status] ?? true;
     const {id} = req.params;
-    const order = await Order.findByIdAndUpdate(id,{[status]: statusValue, paidAt: Date.now()},{new: true});
+    const updateObject = {
+        [status]: statusValue,
+    }
+
+    // if status is true, set statusAt to current date, else set it to undefined
+    if(statusValue)
+        updateObject[status.slice(2).toLowerCase() + "At"] = Date.now();
+    else
+        updateObject[status.slice(2).toLowerCase() + "At"] = undefined;
+
+    const order = await Order.findByIdAndUpdate(id,updateObject,{new: true});
     if(!order) return next(new RequestError("Order not found", 404));
     res.status(200).json({
         status: "success",
