@@ -286,8 +286,8 @@ const getCheckoutSessionHandler = async (req, res,next) => {
             }
         ],
         mode: 'payment',
-        success_url: `${req.protocol}://${req.get('host')}/api/v1/orders/${cart._id}/orders`,
-        cancel_url: `${req.protocol}://${req.get('host')}/api/v1/orders/${cart._id}/cart`,
+        success_url: process.env.STRIPE_SUCCES_URL,
+        cancel_url: process.env.STRIPE_CANCEL_URL,
         customer_email: req.user.email,
         client_reference_id: req.params.id,
         metadata: {
