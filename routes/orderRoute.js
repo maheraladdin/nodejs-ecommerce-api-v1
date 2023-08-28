@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 // require controllers
-const {createCashOrder, belongsToUser, filterOrdersForLoggedUser, getOrder, getOrders, updateOrderCancelStatus, updateOrderDeliverStatus, updateOrderPaidStatus, getCheckoutSession} = require('../controllers/orderController');
+const {createCashOrder, belongsToUser, filterOrdersForLoggedUser, getOrder, getOrders, updateOrderCancelStatus, updateOrderDeliverStatus, updateOrderPaidStatus, createCheckoutSession} = require('../controllers/orderController');
 
 // require validators
 const {createCashOrderValidator, getOrderByIdValidator, updateOrderCancelStatusValidator, updateOrderDeliverStatusValidator, updateOrderPaidStatusValidator, getCheckoutSessionValidator} = require('../utils/ValidationLayer/Validators/orderValidators');
@@ -13,7 +13,7 @@ const {protect, restrictTo} = require('../controllers/authController');
 // routes
 
 router.use(protect);
-router.get("/:id/checkout-session", restrictTo("user"), getCheckoutSessionValidator, getCheckoutSession)
+router.post("/:id/checkout-session", restrictTo("user"), getCheckoutSessionValidator, createCheckoutSession)
 
 
 router.route('/')

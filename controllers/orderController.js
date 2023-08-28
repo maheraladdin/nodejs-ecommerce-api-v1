@@ -242,7 +242,7 @@ module.exports.updateOrderCancelStatus = asyncHandler(updateStatusHandler("isCan
  * @param   {Function} next - next middleware
  * @return {Promise<*>}
  */
-const getCheckoutSessionHandler = async (req, res,next) => {
+const createCheckoutSessionHandler = async (req, res,next) => {
     // app settings
     const tax = 0;
     const shipping = 0;
@@ -308,12 +308,12 @@ const getCheckoutSessionHandler = async (req, res,next) => {
 
 /*
  * @desc    Get checkout session for stripe payment
- * @route   GET /api/v1/orders/:id/checkout-session
+ * @route   POST /api/v1/orders/:id/checkout-session
  * @access  Private (user)
  * @params  id: cart id (cart to be ordered)
  * @body    shippingAddress: string (alias of user address)
  */
-module.exports.getCheckoutSession = asyncHandler(getCheckoutSessionHandler);
+module.exports.createCheckoutSession = asyncHandler(createCheckoutSessionHandler);
 
 /**
  * @desc    create an order for stripe session
