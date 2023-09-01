@@ -360,5 +360,8 @@ module.exports.deleteOne = (Model,kind = "Document") => asyncHandler(async (req,
     if (!document)
         return next(new RequestError(`No ${kind} found for id: ${id}`, 404));
 
-    res.status(204).send();
+    res.status(204).send({
+        status: 'success',
+        message: `${kind} deleted successfully`,
+    });
 });

@@ -21,7 +21,9 @@ module.exports.getReviewById = getOne(Review,'Review');
  * @desc    Create a new review
  * @access  Private (user)
  */
-module.exports.createReview = createOne(Review);
+module.exports.createReview = createOne(Review,{
+    message: "Review added successfully",
+});
 
 /*
  * @route   PUT /api/v1/reviews/:id
