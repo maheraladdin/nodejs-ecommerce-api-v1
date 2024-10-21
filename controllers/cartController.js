@@ -137,7 +137,7 @@ const updateItemQuantityHandler = async (req, res) => {
     // Get cart for logged in user
     const cart = await Cart.findOne({ user: req.user._id });
 
-    // Get item index
+    // Get item index.js
     const item = cart.items.find(item => item._id.toString() === req.params.id);
 
     // If item does not exist, throw error
@@ -256,7 +256,7 @@ const deleteItemFromCartHandler = async (req, res) => {
     // Get cart for logged in user
     const cart = await Cart.findOne({ user: req.user._id });
 
-    // Get item index
+    // Get item index.js
     const item = cart.items.find(item => item._id.toString() === req.params.id);
 
     // If item does not exist, throw error
