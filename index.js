@@ -116,4 +116,4 @@ process.on('unhandledRejection', (err) => exitHandler('UNHANDLED REJECTION! Shut
  */
 process.on('uncaughtException', (err) => exitHandler('UNCAUGHT EXCEPTION! Shutting down...', err));
 
-export default app;
+module.exports = app;
