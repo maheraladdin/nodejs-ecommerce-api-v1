@@ -10,14 +10,14 @@ const expressMongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 
 // require middlewares
-const errorHandler = require('./middlewares/errorHandlerMW');
-const RequestError = require("./utils/requestError");
+const errorHandler = require('../middlewares/errorHandlerMW');
+const RequestError = require("../utils/requestError");
 
 // load env variables from config.env
 dotenv.config({ path: './config.env' });
 
 // connect to database
-require('./config/monogodb_connection')();
+require('../config/monogodb_connection')();
 
 // initialize express app
 const app = express();
@@ -32,7 +32,7 @@ process.env.NODE_ENV === "development" && app.use(morgan('dev')) && console.log(
 
 // use third party middlewares
 
-app.use(require("./config/sessionConfig"));
+app.use(require("../config/sessionConfig"));
 
 // use helmet middleware for setting http headers for security
 app.use(require("helmet")());
@@ -45,7 +45,7 @@ app.options("*", cors());
 app.use(compression());
 
 // stripe webhook
-const {webhookCheckout} = require("./controllers/orderController");
+const {webhookCheckout} = require("../controllers/orderController");
 app.post("/webhook-checkout",express.raw({type: 'application/json'}), webhookCheckout)
 
 // use express.json() to parse json data from request body
@@ -65,7 +65,7 @@ app.use(expressMongoSanitize({allowDots: true}));
 app.use(xss());
 
 // mount routes
-require('./routes/mountRoutes')(app);
+require('../routes/mountRoutes')(app);
 
 // Error handler middleware for handling all unhandled routes
 app.all('*',(req,res,next) => {

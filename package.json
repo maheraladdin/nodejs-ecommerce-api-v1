@@ -2,7 +2,7 @@
   "name": "nodejs-ecommerce-api-v1",
   "version": "1.0.0",
   "description": "Nodejs Ecommerce API v1 with Express, Mongoose, MongoDB, Express-Validator, Morgan, Dotenv, Slugify, Express-Async-Handler",
-  "main": "index.js",
+  "main": "api/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/maheraladdin/nodejs-ecommerce-api-v1.git",
@@ -11,8 +11,8 @@
   "scripts": {
     "jsdoc": "jsdoc -c jsdocConfig.json -r",
     "tests": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js",
-    "start": "NODE_ENV=production node index.js"
+    "dev": "nodemon api/index.js",
+    "start": "NODE_ENV=production node api/index.js"
   },
   "keywords": [
     "nodejs",
