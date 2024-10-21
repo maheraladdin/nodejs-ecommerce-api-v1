@@ -38,7 +38,9 @@ app.use(require("./config/sessionConfig"));
 app.use(require("helmet")());
 
 // use cors middleware for enabling cors requests
-app.use(cors());
+app.use(cors({
+    origin: process.env.CLIENT_URL,
+}));
 app.options("*", cors());
 
 // compress all responses
