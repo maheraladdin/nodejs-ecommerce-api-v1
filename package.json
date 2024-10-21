@@ -12,7 +12,8 @@
     "jsdoc": "jsdoc -c jsdocConfig.json -r",
     "tests": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
-    "start": "NODE_ENV=production node index.js"
+    "start": "NODE_ENV=production node index.js",
+    "vercel-build": "echo 'vercel-build'"
   },
   "keywords": [
     "nodejs",
